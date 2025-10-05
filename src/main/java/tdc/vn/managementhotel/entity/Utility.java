@@ -1,10 +1,10 @@
 package tdc.vn.managementhotel.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import tdc.vn.managementhotel.enums.UtilityType;
 
 @Entity
 @Data
@@ -12,7 +12,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Utility {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-    private String type;
+    @Enumerated(EnumType.STRING)
+    private UtilityType type;
 }

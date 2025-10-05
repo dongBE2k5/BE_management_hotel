@@ -8,4 +8,5 @@ public enum TypeRoom {
     DON,
     DOI,
     GIA_DINH
+
 }
