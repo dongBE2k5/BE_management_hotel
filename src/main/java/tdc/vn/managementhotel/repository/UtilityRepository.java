@@ -8,5 +8,5 @@ import java.util.List;
 
 @Repository
 public interface UtilityRepository extends JpaRepository<Utility, Long> {
-    List<Utility> findBy(Long clientId);
+//    List<Utility> findBy(Long clientId);
 }
