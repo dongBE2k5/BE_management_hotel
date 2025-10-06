@@ -1,4 +1,4 @@
-package tdc.vn.managementhotel.controller;
+package tdc.vn.managementhotel.ControllerAPI;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

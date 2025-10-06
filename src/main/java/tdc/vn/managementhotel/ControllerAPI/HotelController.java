@@ -1,4 +1,4 @@
-package tdc.vn.managementhotel.controller;
+package tdc.vn.managementhotel.ControllerAPI;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.*;
 import tdc.vn.managementhotel.dto.HotelDTO.HotelDTO;
 import tdc.vn.managementhotel.dto.HotelDTO.HotelResponseDTO;
 import tdc.vn.managementhotel.dto.RoomDTO.RoomResponseDTO;
-import tdc.vn.managementhotel.repository.RoomRepository;
 import tdc.vn.managementhotel.service.HotelService;
 import tdc.vn.managementhotel.service.RoomService;
 

@@ -1,4 +1,4 @@
-package tdc.vn.managementhotel.controller;
+package tdc.vn.managementhotel.ControllerAPI;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
