@@ -57,8 +57,8 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
         }
     }
-    @GetMapping("/test")
-    public String test() {
-        return "test";
+    @GetMapping("/user/{id}")
+    public ResponseEntity<?> findUserById(@PathVariable Long id) {
+        return ResponseEntity.status(HttpStatus.OK).body(userService.find(id));
     }
 }

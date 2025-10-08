@@ -3,6 +3,7 @@ package tdc.vn.managementhotel.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import tdc.vn.managementhotel.dto.LoginRequest;
 import tdc.vn.managementhotel.dto.RegisterRequest;
 import tdc.vn.managementhotel.dto.RoomDTO.RoomResponseDTO;
 import tdc.vn.managementhotel.dto.UserDTO.UserResponse;
@@ -50,6 +51,11 @@ public class UserService {
 
         return mapEntityToResponse(userRepository.save(user));
     }
+
+    public UserResponse find(Long id) {
+        return userRepository.findById(id).map(this::mapEntityToResponse).orElse(null);
+    }
+
 
     private UserResponse mapEntityToResponse(User user) {
 //        List<ImageRoomResponseDTO> listRoom = new ArrayList<>();
