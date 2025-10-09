@@ -1,6 +1,9 @@
 package tdc.vn.managementhotel.ControllerAPI;
 
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import tdc.vn.managementhotel.dto.HotelDTO.HotelDTO;
@@ -15,7 +18,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @CrossOrigin
 public class HotelController {
-
     private final HotelService hotelService;
     private final RoomService roomService;
 

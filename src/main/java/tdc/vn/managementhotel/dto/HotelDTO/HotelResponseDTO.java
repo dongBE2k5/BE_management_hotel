@@ -3,6 +3,7 @@ package tdc.vn.managementhotel.dto.HotelDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import tdc.vn.managementhotel.entity.Hotel;
 
 @Data
 @NoArgsConstructor
@@ -16,5 +17,18 @@ public class HotelResponseDTO {
     private String email;
     private String status;
     private String locationName;
-//    private String userName;
+    // private String userName;
+
+    // ✅ Thêm constructor nhận Hotel entity
+    public HotelResponseDTO(Hotel hotel) {
+        this.id = hotel.getId();
+        this.name = hotel.getName();
+        this.address = hotel.getAddress();
+        this.phone = hotel.getPhone();
+        this.image = hotel.getImage();
+        this.email = hotel.getEmail();
+        this.status = hotel.getStatus();
+        this.locationName = hotel.getLocation() != null ? hotel.getLocation().getName() : null;
+        // this.userName = hotel.getUser() != null ? hotel.getUser().getName() : null;
+    }
 }
