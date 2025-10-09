@@ -1,33 +1,28 @@
-package tdc.vn.managementhotel.entity;
+package tdc.vn.managementhotel.dto.BookingDTO;
 
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import tdc.vn.managementhotel.dto.RoomDTO.RoomResponseDTO;
+import tdc.vn.managementhotel.dto.UserDTO.UserResponse;
+import tdc.vn.managementhotel.entity.Room;
+import tdc.vn.managementhotel.entity.User;
 import tdc.vn.managementhotel.enums.BookingStatus;
 import tdc.vn.managementhotel.enums.StatusRoom;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-@Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name="bookings")
-public class Booking {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class BookingResponseDTO {
     private Long id;
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name="user_id", nullable = false)
-    private User user;
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name="room_id", nullable = false)
-    private Room room;
     private LocalDate checkInDate;
     private LocalDate checkOutDate;
-    @Enumerated(EnumType.STRING)
+    private UserResponse user;
+    private RoomResponseDTO room;
     private BookingStatus status;
     private BigDecimal totalPrice;
+
 }
