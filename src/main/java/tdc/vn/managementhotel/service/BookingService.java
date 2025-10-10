@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import tdc.vn.managementhotel.dto.BookingDTO.BookingRequestDTO;
 import tdc.vn.managementhotel.dto.BookingDTO.BookingResponseDTO;
+import tdc.vn.managementhotel.dto.BookingDTO.ChangeBookingStatusRequestDTO;
 import tdc.vn.managementhotel.dto.HotelDTO.HotelDTO;
 import tdc.vn.managementhotel.dto.LocationDTO.LocationResponseDTO;
 import tdc.vn.managementhotel.dto.RoomDTO.RoomResponseDTO;
@@ -13,6 +14,7 @@ import tdc.vn.managementhotel.entity.*;
 import tdc.vn.managementhotel.enums.BookingStatus;
 import tdc.vn.managementhotel.enums.StatusRoom;
 import tdc.vn.managementhotel.repository.BookingRepository;
+import tdc.vn.managementhotel.repository.HistoryChangeBookingStatusRepo;
 import tdc.vn.managementhotel.repository.RoomRepository;
 import tdc.vn.managementhotel.repository.UserRepository;
 
@@ -25,6 +27,7 @@ public class BookingService {
     private final BookingRepository bookingRepository;
     private final UserRepository userRepository;
     private final RoomRepository roomRepository;
+    private final HistoryChangeBookingStatusRepo historyChangeBookingStatusRepo;
 
     public BookingResponseDTO create(BookingRequestDTO bookingDTO) {
         Booking booking = new Booking();
@@ -56,6 +59,12 @@ public class BookingService {
                 .stream()
                 .map(this::mapEntityToResponse)
                 .collect(Collectors.toList());
+    }
+
+    public BookingResponseDTO updateStatus(ChangeBookingStatusRequestDTO changeBookingStatusRequestDTO) {
+        Booking booking = bookingRepository.findById(changeBookingStatusRequestDTO.getBookingId()).orElseThrow(() -> new EntityNotFoundException("Booking not found"));
+        booking.setStatus(changeBookingStatusRequestDTO.getNewStatus());
+        return mapEntityToResponse(bookingRepository.save(booking));
     }
 
 

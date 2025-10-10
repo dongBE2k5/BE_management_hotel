@@ -56,9 +56,15 @@ public class BookingController {
         return ResponseEntity.ok(bookingService.findByUserID(id));
     }
 
-    @PostMapping("/change-status")
-    public ResponseEntity<ChangeBookingStatusResponseDTO> changeStatus(@RequestBody ChangeBookingStatusRequestDTO changeBookingStatusRequestDTO) {
-        System.out.println(changeBookingStatusRequestDTO.toString());
-        return ResponseEntity.ok(historyChangeBookingStatusService.store(changeBookingStatusRequestDTO));
+    @PutMapping("/update-status")
+    public BookingResponseDTO changeStatus(@RequestBody ChangeBookingStatusRequestDTO changeBookingStatusRequestDTO) {
+        historyChangeBookingStatusService.store(changeBookingStatusRequestDTO);
+        return bookingService.updateStatus(changeBookingStatusRequestDTO);
     }
+
+//    @PostMapping("/change-status")
+//    public ResponseEntity<ChangeBookingStatusResponseDTO> changeStatus(@RequestBody ChangeBookingStatusRequestDTO changeBookingStatusRequestDTO) {
+//        System.out.println(changeBookingStatusRequestDTO.toString());
+//        return ResponseEntity.ok(historyChangeBookingStatusService.store(changeBookingStatusRequestDTO));
+//    }
 }
