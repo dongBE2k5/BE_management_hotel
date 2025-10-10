@@ -72,7 +72,7 @@ public class UserService {
                 user.getUsername(),
                 user.getEmail(),
                 user.getPhone(),
-                user.getRole()
+                user.getCccd()
         );
     }
 }

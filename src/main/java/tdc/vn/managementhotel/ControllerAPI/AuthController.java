@@ -21,7 +21,7 @@ import tdc.vn.managementhotel.model.CustomUserDetails;
 import tdc.vn.managementhotel.service.UserService;
 import tdc.vn.managementhotel.util.JwtUtil;
 
-@CrossOrigin
+@CrossOrigin("*")
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
