@@ -46,6 +46,7 @@ public class HistoryChangeBookingStatusService {
                 user.getUsername(),
                 user.getEmail(),
                 user.getPhone(),
+                user.getCccd(),
                 user.getRole()
         );
     }

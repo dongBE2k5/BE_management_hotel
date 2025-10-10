@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -16,5 +18,9 @@ public class HotelResponseDTO {
     private String email;
     private String status;
     private String locationName;
+    private BigDecimal minPrice;
+    private BigDecimal maxPrice;
+
+//    private Integer soPhong;
 //    private String userName;
 }

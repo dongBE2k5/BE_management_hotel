@@ -10,10 +10,15 @@ import tdc.vn.managementhotel.entity.Location;
 import tdc.vn.managementhotel.entity.User;
 import tdc.vn.managementhotel.repository.HotelRepository;
 import tdc.vn.managementhotel.repository.LocationRepository;
+import tdc.vn.managementhotel.repository.RoomRepository;
 import tdc.vn.managementhotel.repository.UserRepository;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+
+import static com.fasterxml.jackson.databind.type.LogicalType.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +27,7 @@ public class HotelService {
     private final HotelRepository hotelRepository;
     private final LocationRepository locationRepository;
     private final UserRepository userRepository;
+    private final RoomRepository roomRepository;
 
     // Create
     public HotelResponseDTO createHotel(HotelDTO dto) {
@@ -88,6 +94,7 @@ public class HotelService {
 
     // Map Entity → Response DTO
     private HotelResponseDTO mapEntityToResponse(Hotel hotel) {
+        Map<String, BigDecimal> priceRange = roomRepository.findPriceRangeByHotelId(hotel.getId());
         return new HotelResponseDTO(
                 hotel.getId(),
                 hotel.getName(),
@@ -96,7 +103,11 @@ public class HotelService {
                 hotel.getImage(),
                 hotel.getEmail(),
                 hotel.getStatus(),
-                hotel.getLocation().getName()
+                hotel.getLocation().getName(),
+                priceRange.get("minPrice"),
+                priceRange.get("maxPrice")
+
+//                hotel.getRooms().size()
 //                hotel.getUser().getUsername()
         );
     }

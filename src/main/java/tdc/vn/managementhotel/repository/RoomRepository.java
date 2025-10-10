@@ -7,8 +7,11 @@ import org.springframework.stereotype.Repository;
 import tdc.vn.managementhotel.entity.Hotel;
 import tdc.vn.managementhotel.entity.Room;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
+
 @Repository
 public interface RoomRepository extends JpaRepository<Room, Long> {
     List<Room> findByHotelId(Long hotelId);
@@ -28,6 +31,15 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
             @Param("checkInDate") LocalDate checkInDate,
             @Param("checkOutDate") LocalDate checkOutDate
     );
+
+    @Query(value = """
+    SELECT 
+        MIN(price) AS minPrice, 
+        MAX(price) AS maxPrice 
+    FROM room 
+    WHERE hotel_id = :hotelId
+""", nativeQuery = true)
+    Map<String, BigDecimal> findPriceRangeByHotelId(@Param("hotelId") Long hotelId);
 
 
 }
