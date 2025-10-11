@@ -1,13 +1,16 @@
 package tdc.vn.managementhotel.controllerAPI;
 
+import java.io.IOException;
 import java.util.Map;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.websocket.server.PathParam;
+import org.springframework.web.servlet.view.RedirectView;
 import tdc.vn.managementhotel.config.ZaloPayConfig;
 import tdc.vn.managementhotel.dto.PaymentDTO.PaymentResponseDTO;
 import tdc.vn.managementhotel.service.PaymentService;
@@ -59,16 +62,18 @@ public class ControllerPayAPI {
 	}
 
     @GetMapping("/successpay")
-    public ResponseEntity<?> successPay(
-            HttpServletRequest request) {
+    public RedirectView successPay(
+            HttpServletRequest request, HttpServletResponse response) throws IOException {
         int paymentStatus =vnPayService.orderReturn(request);
         String orderInfo = request.getParameter("vnp_OrderInfo");
         String paymentTime = request.getParameter("vnp_PayDate");
         String transactionId = request.getParameter("vnp_TransactionNo");
         String totalPrice = request.getParameter("vnp_Amount");
         PaymentResponseDTO paymentResponseDTO = new PaymentResponseDTO(null , null, Long.parseLong(totalPrice), "Wait for payment", Long.parseLong(orderInfo), String.valueOf(paymentStatus));
-
-        return paymentService.updatePay(paymentResponseDTO).hasBody() ? ResponseEntity.ok(paymentStatus): ResponseEntity.status(500).body(paymentResponseDTO);
+//        return paymentService.updatePay(paymentResponseDTO).hasBody() ? ResponseEntity.ok(paymentStatus): ResponseEntity.status(500).body(paymentResponseDTO);
+        String deepLink = "exp://192.168.1.4:8081?status=" + paymentStatus;
+        System.out.print(deepLink);
+        return new RedirectView (deepLink);
 
     }
 
