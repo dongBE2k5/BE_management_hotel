@@ -18,10 +18,14 @@ import tdc.vn.managementhotel.dto.UserDTO.UserLoginResponse;
 import tdc.vn.managementhotel.dto.UserDTO.UserResponse;
 import tdc.vn.managementhotel.entity.Role;
 import tdc.vn.managementhotel.model.CustomUserDetails;
+import tdc.vn.managementhotel.service.CustomUserDetailsService;
+import tdc.vn.managementhotel.service.JwtBlacklistService;
 import tdc.vn.managementhotel.service.UserService;
 import tdc.vn.managementhotel.util.JwtUtil;
 
-@CrossOrigin("*")
+import java.util.Map;
+
+@CrossOrigin
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -61,4 +65,47 @@ public class AuthController {
     public ResponseEntity<?> findUserById(@PathVariable Long id) {
         return ResponseEntity.status(HttpStatus.OK).body(userService.find(id));
     }
+    @Autowired
+    private JwtBlacklistService jwtBlacklistService;
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@RequestHeader("Authorization") String authHeader) {
+        try {
+            if (authHeader != null && authHeader.startsWith("Bearer ")) {
+                String token = authHeader.substring(7); // bỏ "Bearer "
+                jwtBlacklistService.blacklistToken(token);
+            }
+            return ResponseEntity.ok("Logout thành công!");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Logout thất bại!");
+        }
+    }
+    @Autowired
+    private CustomUserDetailsService customUserDetailsService;
+
+    @GetMapping("/me")
+    public ResponseEntity<?> getCurrentUser(@RequestHeader("Authorization") String authHeader) {
+        if(authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Missing token");
+        }
+
+        String token = authHeader.substring(7);
+
+        if(jwtBlacklistService.isTokenBlacklisted(token)) { // kiểm tra token đã logout chưa
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token revoked");
+        }
+
+        if(!jwtUtil.validateToken(token)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid token");
+        }
+
+        String username = jwtUtil.getUsernameFromJWT(token);
+        CustomUserDetails userDetails = (CustomUserDetails) customUserDetailsService.loadUserByUsername(username);
+
+
+        return ResponseEntity.ok(userDetails); // trả về thông tin user
+    }
+
+
+
 }

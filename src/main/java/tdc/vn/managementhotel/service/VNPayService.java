@@ -83,7 +83,7 @@ public class VNPayService {
         return paymentUrl;
     }
 
-    public int orderReturn(HttpServletRequest request){
+    public String orderReturn(HttpServletRequest request){
         Map fields = new HashMap();
         for (Enumeration params = request.getParameterNames(); params.hasMoreElements();) {
             String fieldName = null;
@@ -108,13 +108,14 @@ public class VNPayService {
         }
         String signValue = VNPayConfig.hashAllFields(fields);
         if (signValue.equals(vnp_SecureHash)) {
-            if ("00".equals(request.getParameter("vnp_TransactionStatus"))) {
-                return 1;
-            } else {
-                return 0;
-            }
+//            if ("00".equals(request.getParameter("vnp_TransactionStatus"))) {
+//                return 1;
+//            } else {
+//                return 0;
+//            }
+            return   request.getParameter("vnp_TransactionStatus");
         } else {
-            return -1;
+            return "-1";
         }
     }
 

@@ -1,5 +1,6 @@
 package tdc.vn.managementhotel.entity;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -23,6 +24,8 @@ public class HistoryChangeBookingStatus extends BaseEntity {
     private BookingStatus oldStatus;
     @Enumerated(EnumType.STRING)
     private BookingStatus newStatus;
+
+    @Nullable
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="changeBy_id", nullable = false)
     private User changedBy;
