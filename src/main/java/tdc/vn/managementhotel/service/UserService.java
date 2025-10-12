@@ -72,6 +72,7 @@ public class UserService {
                 user.getUsername(),
                 user.getEmail(),
                 user.getPhone(),
+                user.getCccd(),
                 user.getRole()
         );
     }
