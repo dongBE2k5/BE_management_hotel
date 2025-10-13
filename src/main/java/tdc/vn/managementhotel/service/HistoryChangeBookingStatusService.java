@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import tdc.vn.managementhotel.dto.BookingDTO.BookingResponseDTO;
 import tdc.vn.managementhotel.dto.BookingDTO.ChangeBookingStatusRequestDTO;
 import tdc.vn.managementhotel.dto.BookingDTO.ChangeBookingStatusResponseDTO;
-import tdc.vn.managementhotel.dto.HotelDTO.HotelDTO;
 import tdc.vn.managementhotel.dto.RoomDTO.RoomResponseDTO;
 import tdc.vn.managementhotel.dto.UserDTO.UserResponse;
 import tdc.vn.managementhotel.entity.*;
@@ -14,6 +13,9 @@ import tdc.vn.managementhotel.repository.BookingRepository;
 import tdc.vn.managementhotel.repository.HistoryChangeBookingStatusRepo;
 import tdc.vn.managementhotel.repository.HotelRepository;
 import tdc.vn.managementhotel.repository.UserRepository;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +29,12 @@ public class HistoryChangeBookingStatusService {
         HistoryChangeBookingStatus historyChangeBookingStatus = new HistoryChangeBookingStatus();
         mapDtoToEntity(changeBookingStatusRequestDTO, historyChangeBookingStatus);
         return mapEntityToResponse(historyChangeBookingStatusRepo.save(historyChangeBookingStatus));
+    }
+    public List<ChangeBookingStatusResponseDTO> getByBookingID(Long bookingId ) {
+        return historyChangeBookingStatusRepo.findByBooking_Id(bookingId)
+                .stream()
+                .map(this::mapEntityToResponse)
+                .collect(Collectors.toList());
     }
 
     private ChangeBookingStatusResponseDTO mapEntityToResponse(HistoryChangeBookingStatus changeBookingStatus) {

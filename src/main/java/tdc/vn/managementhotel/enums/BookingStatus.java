@@ -6,4 +6,5 @@ public enum BookingStatus {
     DA_COC,
     CHECK_IN,
     CHECK_OUT,
+    DA_HUY
 }

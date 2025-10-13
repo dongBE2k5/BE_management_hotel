@@ -7,12 +7,9 @@ import tdc.vn.managementhotel.dto.BookingDTO.BookingRequestDTO;
 import tdc.vn.managementhotel.dto.BookingDTO.BookingResponseDTO;
 import tdc.vn.managementhotel.dto.BookingDTO.ChangeBookingStatusRequestDTO;
 import tdc.vn.managementhotel.dto.BookingDTO.ChangeBookingStatusResponseDTO;
-import tdc.vn.managementhotel.dto.HotelDTO.HotelDTO;
-import tdc.vn.managementhotel.dto.HotelDTO.HotelResponseDTO;
 import tdc.vn.managementhotel.service.BookingService;
 import tdc.vn.managementhotel.service.HistoryChangeBookingStatusService;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @CrossOrigin
@@ -48,7 +45,13 @@ public class BookingController {
 
     @GetMapping("/hotel/{id}")
     public ResponseEntity<List<BookingResponseDTO>> getAllBookingsByHotelId(@PathVariable Long id) {
-        return ResponseEntity.ok(bookingService.findByHotelID(id));
+        List<BookingResponseDTO> bookings = bookingService.findByHotelID(id);
+
+        if (bookings.isEmpty()) {
+            return ResponseEntity.noContent().build(); // 204 No Content
+        }
+
+        return ResponseEntity.ok().body(bookings); // 200 OK + JSON list
     }
 
     @GetMapping("/user/{id}")
@@ -62,6 +65,10 @@ public class BookingController {
         return bookingService.updateStatus(changeBookingStatusRequestDTO);
     }
 
+    @GetMapping("/history/{bookingid}")
+    public ResponseEntity<List<ChangeBookingStatusResponseDTO>> getBookingHistory(@PathVariable Long bookingid) {
+        return  ResponseEntity.ok(historyChangeBookingStatusService.getByBookingID(bookingid));
+    }
 //    @PostMapping("/change-status")
 //    public ResponseEntity<ChangeBookingStatusResponseDTO> changeStatus(@RequestBody ChangeBookingStatusRequestDTO changeBookingStatusRequestDTO) {
 //        System.out.println(changeBookingStatusRequestDTO.toString());
