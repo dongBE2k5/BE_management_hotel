@@ -24,5 +24,6 @@ public class BookingResponseDTO {
     private RoomResponseDTO room;
     private BookingStatus status;
     private BigDecimal totalPrice;
+    private String imageHotel;
 
 }

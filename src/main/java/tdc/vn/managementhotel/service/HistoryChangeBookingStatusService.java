@@ -21,6 +21,7 @@ public class HistoryChangeBookingStatusService {
     private final HistoryChangeBookingStatusRepo historyChangeBookingStatusRepo;
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
+    private final HotelRepository hotelRepository;
 
     public ChangeBookingStatusResponseDTO store(ChangeBookingStatusRequestDTO changeBookingStatusRequestDTO) {
         HistoryChangeBookingStatus historyChangeBookingStatus = new HistoryChangeBookingStatus();
@@ -73,7 +74,9 @@ public class HistoryChangeBookingStatusService {
                 mapEntityToResponse(booking.getUser()),
                 mapEntityToResponse(booking.getRoom()),
                 booking.getStatus(),
-                booking.getTotalPrice()
+                booking.getTotalPrice(),
+                getImageHotel(booking.getRoom().getHotel().getId())
+
         );
     }
 
@@ -88,5 +91,9 @@ public class HistoryChangeBookingStatusService {
         User user = userRepository.findById(dto.getChangedBy())
                 .orElseThrow(() -> new EntityNotFoundException("User not found"));
         historyChangeBookingStatus.setChangedBy(user);
+    }
+    private String getImageHotel(Long id) {
+        Hotel hotel = hotelRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Hotel not found"));
+        return hotel.getImage();
     }
 }

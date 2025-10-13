@@ -13,10 +13,7 @@ import tdc.vn.managementhotel.dto.UserDTO.UserResponse;
 import tdc.vn.managementhotel.entity.*;
 import tdc.vn.managementhotel.enums.BookingStatus;
 import tdc.vn.managementhotel.enums.StatusRoom;
-import tdc.vn.managementhotel.repository.BookingRepository;
-import tdc.vn.managementhotel.repository.HistoryChangeBookingStatusRepo;
-import tdc.vn.managementhotel.repository.RoomRepository;
-import tdc.vn.managementhotel.repository.UserRepository;
+import tdc.vn.managementhotel.repository.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,6 +25,7 @@ public class BookingService {
     private final UserRepository userRepository;
     private final RoomRepository roomRepository;
     private final HistoryChangeBookingStatusRepo historyChangeBookingStatusRepo;
+    private final HotelRepository hotelRepository;
 
     public BookingResponseDTO create(BookingRequestDTO bookingDTO) {
         Booking booking = new Booking();
@@ -116,7 +114,12 @@ public class BookingService {
                 mapEntityToResponse(booking.getUser()),
                 mapEntityToResponse(booking.getRoom()),
                 booking.getStatus(),
-                booking.getTotalPrice()
+                booking.getTotalPrice(),
+                getImageHotel(booking.getRoom().getHotel().getId())
         );
+    }
+    private String getImageHotel(Long id) {
+        Hotel hotel = hotelRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Hotel not found"));
+        return hotel.getImage();
     }
 }
