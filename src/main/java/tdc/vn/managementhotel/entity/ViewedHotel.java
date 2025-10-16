@@ -16,7 +16,6 @@ public class ViewedHotel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private Long userId; // ID của user đã xem
     private Long hotelId;
     private LocalDateTime viewedAt;
