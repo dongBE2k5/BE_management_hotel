@@ -45,6 +45,16 @@ public class AuthController {
         }
     }
 
+    @PostMapping("/register-employee")
+    public ResponseEntity<?> registerEmployee(@RequestBody RegisterRequest req) {
+        try {
+            UserResponse created = userService.registerEmployee(req);
+            return ResponseEntity.status(HttpStatus.CREATED).body(created);
+        } catch (RuntimeException ex) {
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest req) {
         try {

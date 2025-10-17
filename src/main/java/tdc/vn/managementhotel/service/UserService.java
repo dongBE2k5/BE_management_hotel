@@ -52,6 +52,31 @@ public class UserService {
         return mapEntityToResponse(userRepository.save(user));
     }
 
+    public UserResponse registerEmployee(RegisterRequest req) {
+        if (userRepository.existsByUsername(req.getUsername())) {
+            throw new RuntimeException("Username đã tồn tại");
+        }
+        if (req.getEmail() != null && userRepository.existsByEmail(req.getEmail())) {
+            throw new RuntimeException("Email đã tồn tại");
+        }
+
+        Role role = roleRepository.findByName("ROLE_EMPLOYEE")
+                .orElseThrow(() -> new RuntimeException("Default role ROLE_EMPLOYEE not found."));
+
+        User user = new User();
+        user.setUsername(req.getUsername());
+        user.setPassword(passwordEncoder.encode(req.getPassword())); // BCrypt encode
+        user.setEmail(req.getEmail());
+        user.setFullName(req.getFullName());
+        user.setPhone(req.getPhone());
+//        user.setCccd(req.getCccd());
+        user.setRole(role);
+
+        return mapEntityToResponse(userRepository.save(user));
+    }
+
+
+
     public UserResponse find(Long id) {
         return userRepository.findById(id).map(this::mapEntityToResponse).orElse(null);
     }

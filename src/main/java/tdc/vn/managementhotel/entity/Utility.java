@@ -6,6 +6,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import tdc.vn.managementhotel.enums.UtilityType;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Entity
 @Data
 @NoArgsConstructor
@@ -17,4 +20,6 @@ public class Utility {
     private String name;
     @Enumerated(EnumType.STRING)
     private UtilityType type;
+    @OneToMany(mappedBy = "utility", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<HotelUtility> hotelUtilities = new HashSet<>();
 }
