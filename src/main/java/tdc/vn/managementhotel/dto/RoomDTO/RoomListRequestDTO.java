@@ -1,19 +1,21 @@
 package tdc.vn.managementhotel.dto.RoomDTO;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import tdc.vn.managementhotel.enums.StatusRoom;
+
 import java.math.BigDecimal;
 import java.util.List;
 
-import lombok.Data;
-import tdc.vn.managementhotel.dto.ImageRoomDTO.ImageRoomRequestDTO;
-import tdc.vn.managementhotel.enums.StatusRoom;
-
 @Data
-public class RoomRequestDTO {
-    private String roomNumber;
+@NoArgsConstructor
+@AllArgsConstructor
+public class RoomListRequestDTO {
+    private List<String> roomNumberList;
     private String description;
     private StatusRoom status;
     private Long typeRoomId;
     private Long hotelId;
-//    private List<ImageRoomRequestDTO> imageRoom;
     private BigDecimal price;
 }

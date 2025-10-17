@@ -28,7 +28,7 @@ public class RoomService {
     // Create
     public RoomResponseDTO createRoom(RoomRequestDTO dto) {
         Room room = new Room();
-        System.out.println(dto.getImageRoom());
+//        System.out.println(dto.getImageRoom());
         mapDtoToEntity(dto, room);
         RoomResponseDTO roomResponseDTO = mapEntityToResponse(roomRepository.save(room));
 
