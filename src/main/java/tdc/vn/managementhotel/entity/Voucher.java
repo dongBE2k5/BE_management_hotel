@@ -16,10 +16,14 @@ public class Voucher {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    private String name; // 👈 Thêm trường này
+
     private String code;
     private String description;
     private Long priceCondition;
     private Long hotelId;
-    private Integer quantity;
+    private Integer quantity; // Tổng số voucher
     private Integer percent;
+    private Integer used = 0; // Số voucher đã dùng
 }
