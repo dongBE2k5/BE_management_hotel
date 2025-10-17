@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import tdc.vn.managementhotel.enums.BookingStatus;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -40,5 +41,9 @@ public class Booking {
     // 🕒 Thời điểm tạo booking (tự động lưu)
     @Column(updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
+
+    // 🕒 Thời điểm cập nhật trạng thái
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
 
 }

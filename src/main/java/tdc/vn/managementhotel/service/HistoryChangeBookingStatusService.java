@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import tdc.vn.managementhotel.dto.BookingDTO.BookingResponseDTO;
 import tdc.vn.managementhotel.dto.BookingDTO.ChangeBookingStatusRequestDTO;
 import tdc.vn.managementhotel.dto.BookingDTO.ChangeBookingStatusResponseDTO;
+import tdc.vn.managementhotel.dto.HotelSummaryDTO;
 import tdc.vn.managementhotel.dto.RoomDTO.RoomResponseDTO;
 import tdc.vn.managementhotel.dto.UserDTO.UserResponse;
 import tdc.vn.managementhotel.entity.*;
@@ -68,10 +69,10 @@ public class HistoryChangeBookingStatusService {
                 room.getDescription(),
                 room.getStatus(),
                 room.getTypeOfRoom().getRoom(),
-                room.getHotel().getName(),
-                room.getPrice()
-
+                room.getPrice(),
+                new HotelSummaryDTO(room.getHotel().getId(), room.getHotel().getName()) // ✅ truyền object hotel
         );
+
     }
 
     private BookingResponseDTO mapEntityToResponse(Booking booking) {
@@ -83,10 +84,12 @@ public class HistoryChangeBookingStatusService {
                 mapEntityToResponse(booking.getRoom()),
                 booking.getStatus(),
                 booking.getTotalPrice(),
-                getImageHotel(booking.getRoom().getHotel().getId())
-
+                getImageHotel(booking.getRoom().getHotel().getId()),
+                booking.getCreatedAt(),   // 🕒 thêm
+                booking.getUpdatedAt()    // 🕒 thêm
         );
     }
+
 
     private void mapDtoToEntity(ChangeBookingStatusRequestDTO dto, HistoryChangeBookingStatus historyChangeBookingStatus) {
         historyChangeBookingStatus.setNewStatus(dto.getNewStatus());

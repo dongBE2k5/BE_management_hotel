@@ -12,6 +12,7 @@ import tdc.vn.managementhotel.enums.StatusRoom;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -25,5 +26,8 @@ public class BookingResponseDTO {
     private BookingStatus status;
     private BigDecimal totalPrice;
     private String imageHotel;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
 
 }

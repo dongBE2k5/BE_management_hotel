@@ -3,6 +3,7 @@ package tdc.vn.managementhotel.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import tdc.vn.managementhotel.dto.HotelDTO.HotelResponseDTO;
+import tdc.vn.managementhotel.entity.Hotel;
 import tdc.vn.managementhotel.entity.ViewedHotel;
 import tdc.vn.managementhotel.repository.ViewedHotelRepository;
 import tdc.vn.managementhotel.repository.HotelRepository;
@@ -19,8 +20,12 @@ public class ViewedHotelService {
     private final HotelRepository hotelRepository;
 
     public void saveViewedHotel(Long userId, Long hotelId) {
+        // ✅ Lấy Hotel entity theo id
+        Hotel hotel = hotelRepository.findById(hotelId)
+                .orElseThrow(() -> new RuntimeException("Hotel not found"));
+
         // ✅ Kiểm tra đã tồn tại bản ghi chưa
-        Optional<ViewedHotel> existing = viewedHotelRepository.findByUserIdAndHotelId(userId, hotelId);
+        Optional<ViewedHotel> existing = viewedHotelRepository.findByUserIdAndHotel(userId, hotel);
 
         if (existing.isPresent()) {
             // ✅ Nếu đã tồn tại → chỉ cập nhật thời gian
@@ -31,7 +36,7 @@ public class ViewedHotelService {
             // ✅ Nếu chưa có → thêm mới
             ViewedHotel viewed = ViewedHotel.builder()
                     .userId(userId)
-                    .hotelId(hotelId)
+                    .hotel(hotel) // 👈 dùng entity Hotel
                     .viewedAt(LocalDateTime.now())
                     .build();
             viewedHotelRepository.save(viewed);
@@ -41,10 +46,7 @@ public class ViewedHotelService {
     public List<HotelResponseDTO> getRecentlyViewedHotels(Long userId) {
         return viewedHotelRepository.findTop10ByUserIdOrderByViewedAtDesc(userId)
                 .stream()
-                .map(v -> hotelRepository.findById(v.getHotelId())
-                        .map(HotelResponseDTO::new)
-                        .orElse(null))
-                .filter(h -> h != null)
+                .map(v -> new HotelResponseDTO(v.getHotel())) // 👈 lấy từ entity Hotel
                 .collect(Collectors.toList());
     }
 }

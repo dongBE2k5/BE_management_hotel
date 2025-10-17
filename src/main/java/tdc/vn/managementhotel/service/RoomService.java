@@ -4,6 +4,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.stereotype.Service;
+import tdc.vn.managementhotel.dto.HotelSummaryDTO;
 import tdc.vn.managementhotel.dto.ImageRoomDTO.ImageRoomResponseDTO;
 import tdc.vn.managementhotel.dto.RoomDTO.RoomRequestDTO;
 import tdc.vn.managementhotel.dto.RoomDTO.RoomResponseDTO;
@@ -142,10 +143,9 @@ public class RoomService {
                 room.getDescription(),
                 room.getStatus(),
                 room.getTypeOfRoom().getRoom(),
-                room.getHotel().getName(),
-//                listRoom,
-                room.getPrice()
-
+                room.getPrice(),
+                new HotelSummaryDTO(room.getHotel().getId(), room.getHotel().getName()) // ✅ truyền object hotel
         );
+
     }
 }

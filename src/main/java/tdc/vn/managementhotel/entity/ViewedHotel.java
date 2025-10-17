@@ -18,6 +18,8 @@ public class ViewedHotel {
     private Long id;
 
     private Long userId; // ID của user đã xem
-    private Long hotelId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "hotel_id", nullable = false)
+    private Hotel hotel;   // đây là entity Hotel
     private LocalDateTime viewedAt;
 }

@@ -7,13 +7,14 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import tdc.vn.managementhotel.entity.Booking;
+import tdc.vn.managementhotel.enums.BookingStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
 public interface BookingRepository extends JpaRepository<Booking, Long> {
-
+    boolean existsByUser_IdAndRoom_IdAndStatus(Long userId, Long roomId, BookingStatus status);
     List<Booking> findByRoom_Hotel_Id(Long hotelId);
     List<Booking> findByUser_Id(Long userId);
 

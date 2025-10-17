@@ -7,6 +7,7 @@ import tdc.vn.managementhotel.dto.BookingDTO.BookingRequestDTO;
 import tdc.vn.managementhotel.dto.BookingDTO.BookingResponseDTO;
 import tdc.vn.managementhotel.dto.BookingDTO.ChangeBookingStatusRequestDTO;
 import tdc.vn.managementhotel.dto.HotelDTO.HotelDTO;
+import tdc.vn.managementhotel.dto.HotelSummaryDTO;
 import tdc.vn.managementhotel.dto.LocationDTO.LocationResponseDTO;
 import tdc.vn.managementhotel.dto.RoomDTO.RoomResponseDTO;
 import tdc.vn.managementhotel.dto.UserDTO.UserResponse;
@@ -100,11 +101,11 @@ public class BookingService {
                 room.getDescription(),
                 room.getStatus(),
                 room.getTypeOfRoom().getRoom(),
-                room.getHotel().getName(),
-                room.getPrice()
-
+                room.getPrice(),
+                new HotelSummaryDTO(room.getHotel().getId(), room.getHotel().getName())
         );
     }
+
 
     private BookingResponseDTO mapEntityToResponse(Booking booking) {
         return new BookingResponseDTO(
@@ -115,11 +116,15 @@ public class BookingService {
                 mapEntityToResponse(booking.getRoom()),
                 booking.getStatus(),
                 booking.getTotalPrice(),
-                getImageHotel(booking.getRoom().getHotel().getId())
+                getImageHotel(booking.getRoom().getHotel().getId()),
+                booking.getCreatedAt(),
+                booking.getUpdatedAt()
         );
     }
+
     private String getImageHotel(Long id) {
         Hotel hotel = hotelRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Hotel not found"));
         return hotel.getImage();
     }
+
 }
