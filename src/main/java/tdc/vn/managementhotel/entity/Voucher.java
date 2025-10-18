@@ -26,4 +26,6 @@ public class Voucher {
     private Integer quantity; // Tổng số voucher
     private Integer percent;
     private Integer used = 0; // Số voucher đã dùng
+    private int initialQuantity;
+    private boolean active = true;
 }
