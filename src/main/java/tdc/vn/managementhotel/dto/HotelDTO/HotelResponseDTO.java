@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import tdc.vn.managementhotel.entity.Hotel;
 
+import java.math.BigDecimal;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -17,6 +19,8 @@ public class HotelResponseDTO {
     private String email;
     private String status;
     private String locationName;
+    private BigDecimal minPrice;
+    private BigDecimal maxPrice;
     // private String userName;
 
     // ✅ Thêm constructor nhận Hotel entity
