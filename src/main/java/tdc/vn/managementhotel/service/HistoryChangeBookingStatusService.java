@@ -86,7 +86,8 @@ public class HistoryChangeBookingStatusService {
                 booking.getTotalPrice(),
                 getImageHotel(booking.getRoom().getHotel().getId()),
                 booking.getCreatedAt(),   // 🕒 thêm
-                booking.getUpdatedAt()    // 🕒 thêm
+                booking.getUpdatedAt(),    // 🕒 thêm
+                booking.getVoucher().getId()
         );
     }
 

@@ -9,7 +9,7 @@ import tdc.vn.managementhotel.entity.Room;
 import tdc.vn.managementhotel.entity.User;
 import tdc.vn.managementhotel.enums.BookingStatus;
 import tdc.vn.managementhotel.enums.StatusRoom;
-
+import tdc.vn.managementhotel.dto.VoucherDTO.VoucherResponseDTO;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -28,6 +28,6 @@ public class BookingResponseDTO {
     private String imageHotel;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-
+    private Long voucherId;
 
 }

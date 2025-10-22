@@ -8,7 +8,6 @@ import tdc.vn.managementhotel.dto.HotelDTO.ViewedHotelRequestDTO;
 import tdc.vn.managementhotel.service.ViewedHotelService;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/viewed-hotels")
@@ -24,9 +23,16 @@ public class ViewedHotelController {
         return ResponseEntity.ok().build();
     }
 
-
     @GetMapping("/{userId}")
     public ResponseEntity<List<HotelResponseDTO>> getRecentlyViewed(@PathVariable Long userId) {
         return ResponseEntity.ok(viewedHotelService.getRecentlyViewedHotels(userId));
+    }
+
+    @GetMapping("/recently-viewed")
+    public ResponseEntity<List<HotelResponseDTO>> getRecentlyViewedByUserAndLocation(
+            @RequestParam Long userId,
+            @RequestParam(required = false) Long locationId
+    ) {
+        return ResponseEntity.ok(viewedHotelService.getRecentlyViewedHotelsByLocation(userId, locationId));
     }
 }

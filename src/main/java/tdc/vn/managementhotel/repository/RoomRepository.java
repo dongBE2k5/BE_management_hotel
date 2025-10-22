@@ -14,6 +14,12 @@ import java.util.Map;
 
 @Repository
 public interface RoomRepository extends JpaRepository<Room, Long> {
+
+
+    @Query("SELECT r.price FROM Room r WHERE r.hotel.id = :hotelId")
+    List<BigDecimal> findPricesByHotelId(@Param("hotelId") Long hotelId);
+
+
     List<Room> findByHotelId(Long hotelId);
     @Query(value = """
     SELECT r.* 
@@ -40,6 +46,5 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
     WHERE hotel_id = :hotelId
 """, nativeQuery = true)
     Map<String, BigDecimal> findPriceRangeByHotelId(@Param("hotelId") Long hotelId);
-
 
 }

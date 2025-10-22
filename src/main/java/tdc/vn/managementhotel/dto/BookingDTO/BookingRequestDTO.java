@@ -15,5 +15,6 @@ public class BookingRequestDTO {
     private LocalDate checkOutDate;
     private Long roomId;
     private Long userId;
+    private Long voucherId;
     private BigDecimal totalPrice;
 }

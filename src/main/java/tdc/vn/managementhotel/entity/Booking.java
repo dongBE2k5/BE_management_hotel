@@ -30,6 +30,10 @@ public class Booking {
     @JoinColumn(name="room_id", nullable = false)
     private Room room;
 
+    // ✅ Thêm voucher nếu có
+    @ManyToOne
+    @JoinColumn(name = "voucher_id", nullable = true)
+    private Voucher voucher;
     private LocalDate checkInDate;
     private LocalDate checkOutDate;
 

@@ -2,6 +2,7 @@ package tdc.vn.managementhotel.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tdc.vn.managementhotel.dto.BookingDTO.BookingRequestDTO;
 import tdc.vn.managementhotel.dto.BookingDTO.BookingResponseDTO;
@@ -11,6 +12,7 @@ import tdc.vn.managementhotel.dto.HotelSummaryDTO;
 import tdc.vn.managementhotel.dto.LocationDTO.LocationResponseDTO;
 import tdc.vn.managementhotel.dto.RoomDTO.RoomResponseDTO;
 import tdc.vn.managementhotel.dto.UserDTO.UserResponse;
+import tdc.vn.managementhotel.dto.VoucherDTO.VoucherResponseDTO;
 import tdc.vn.managementhotel.entity.*;
 import tdc.vn.managementhotel.enums.BookingStatus;
 import tdc.vn.managementhotel.enums.StatusRoom;
@@ -27,13 +29,23 @@ public class BookingService {
     private final RoomRepository roomRepository;
     private final HistoryChangeBookingStatusRepo historyChangeBookingStatusRepo;
     private final HotelRepository hotelRepository;
+    @Autowired
+    private VoucherRepository voucherRepository;
 
     public BookingResponseDTO create(BookingRequestDTO bookingDTO) {
         Booking booking = new Booking();
         mapDtoToEntity(bookingDTO, booking);
-        return mapEntityToResponse(bookingRepository.save(booking));
-    }
 
+        // ✅ nếu có voucherId thì gán voucher
+        if (bookingDTO.getVoucherId() != null) {
+            Voucher voucher = voucherRepository.findById(bookingDTO.getVoucherId())
+                    .orElseThrow(() -> new RuntimeException("Voucher không tồn tại"));
+            booking.setVoucher(voucher);
+        }
+
+        Booking saved = bookingRepository.save(booking);
+        return mapEntityToResponse(saved);
+    }
     public List<BookingResponseDTO> all() {
         return bookingRepository.findAll()
                 .stream()
@@ -118,7 +130,8 @@ public class BookingService {
                 booking.getTotalPrice(),
                 getImageHotel(booking.getRoom().getHotel().getId()),
                 booking.getCreatedAt(),
-                booking.getUpdatedAt()
+                booking.getUpdatedAt(),
+                booking.getVoucher().getId()
         );
     }
 
@@ -126,5 +139,7 @@ public class BookingService {
         Hotel hotel = hotelRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Hotel not found"));
         return hotel.getImage();
     }
+
+
 
 }
