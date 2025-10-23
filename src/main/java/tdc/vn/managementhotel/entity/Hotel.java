@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -27,6 +28,12 @@ public class Hotel {
     private String image;
     private String email;
     private String status;
+    @Transient // Không lưu vào DB, chỉ dùng tạm để gửi ra FE
+    private BigDecimal minPrice;
+
+    @Transient
+    private BigDecimal maxPrice;
+
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name="host_id", nullable = false)
     private User user;
@@ -42,7 +49,6 @@ public class Hotel {
     private Set<HotelUtility> hotelUtilities = new HashSet<>();
 
     @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<TypeOfRoom> typeOfRooms;
     private List<ImageRoom> imageRooms = new ArrayList<>();
 
 }

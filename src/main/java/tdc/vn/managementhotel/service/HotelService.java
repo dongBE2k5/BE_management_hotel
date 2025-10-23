@@ -11,6 +11,7 @@ import tdc.vn.managementhotel.dto.HotelDTO.HotelResponseDTO;
 import tdc.vn.managementhotel.dto.LocationDTO.LocationResponseDTO;
 import tdc.vn.managementhotel.entity.Hotel;
 import tdc.vn.managementhotel.entity.Location;
+import tdc.vn.managementhotel.entity.Room;
 import tdc.vn.managementhotel.entity.User;
 import tdc.vn.managementhotel.repository.HotelRepository;
 import tdc.vn.managementhotel.repository.LocationRepository;
@@ -19,6 +20,7 @@ import tdc.vn.managementhotel.repository.UserRepository;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -69,20 +71,6 @@ public class HotelService {
                 .map(this::mapEntityToResponse)
                 .collect(Collectors.toList());
     }
-
-    public ResponseEntity<ApiResponse> getHotelsByUserId(Long userId) {
-        ApiResponse<List<HotelResponseDTO>> response = new ApiResponse<>(
-                HttpStatus.CREATED.value(),
-                "Lấy danh sách khách sạn thành công",
-                hotelRepository.findByUserId(userId)
-                        .stream()
-                        .map(this::mapEntityToResponse)
-                        .collect(Collectors.toList()),
-                LocalDateTime.now()
-        );
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
-
-    }
     // Get hotels by location
     public List<HotelResponseDTO> getHotelsByLocation(Long id) {
         return hotelRepository.findByLocationId(id)
@@ -127,4 +115,38 @@ public class HotelService {
 //                hotel.getUser().getUsername()
         );
     }
+    // tim kiem form
+    public List<Hotel> searchHotels(String name, String city, String status, BigDecimal minPrice, BigDecimal maxPrice) {
+        if (name != null && name.trim().isEmpty()) name = null;
+        if (city != null && city.trim().isEmpty()) city = null;
+        if (status != null && status.trim().isEmpty()) status = null;
+        System.out.println(status);
+        List<Hotel> hotels = hotelRepository.searchHotels(name, city, status, minPrice, maxPrice);
+
+        for (Hotel hotel : hotels) {
+            List<BigDecimal> prices = roomRepository.findPricesByHotelId(hotel.getId());
+            if (prices != null && !prices.isEmpty()) {
+                hotel.setMinPrice(Collections.min(prices));
+                hotel.setMaxPrice(Collections.max(prices));
+            }
+        }
+
+        if (minPrice != null || maxPrice != null) {
+            hotels = hotels.stream()
+                    .filter(h -> {
+                        BigDecimal hotelMin = h.getMinPrice();
+                        BigDecimal hotelMax = h.getMaxPrice();
+
+                        boolean matchMin = (minPrice == null) || (hotelMin != null && hotelMin.compareTo(minPrice) >= 0);
+                        boolean matchMax = (maxPrice == null) || (hotelMax != null && hotelMax.compareTo(maxPrice) <= 0);
+
+                        return matchMin && matchMax;
+                    })
+                    .collect(Collectors.toList());
+        }
+
+        return hotels;
+    }
+
+
 }

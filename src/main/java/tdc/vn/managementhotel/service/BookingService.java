@@ -2,20 +2,25 @@ package tdc.vn.managementhotel.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import tdc.vn.managementhotel.dto.BookingDTO.BookingRequestDTO;
 import tdc.vn.managementhotel.dto.BookingDTO.BookingResponseDTO;
 import tdc.vn.managementhotel.dto.BookingDTO.ChangeBookingStatusRequestDTO;
+import tdc.vn.managementhotel.dto.HotelDTO.HotelBookingCountDTO;
 import tdc.vn.managementhotel.dto.HotelDTO.HotelDTO;
 import tdc.vn.managementhotel.dto.HotelSummaryDTO;
 import tdc.vn.managementhotel.dto.LocationDTO.LocationResponseDTO;
 import tdc.vn.managementhotel.dto.RoomDTO.RoomResponseDTO;
 import tdc.vn.managementhotel.dto.UserDTO.UserResponse;
+import tdc.vn.managementhotel.dto.VoucherDTO.VoucherResponseDTO;
 import tdc.vn.managementhotel.entity.*;
 import tdc.vn.managementhotel.enums.BookingStatus;
 import tdc.vn.managementhotel.enums.StatusRoom;
 import tdc.vn.managementhotel.repository.*;
 
+import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,13 +32,26 @@ public class BookingService {
     private final RoomRepository roomRepository;
     private final HistoryChangeBookingStatusRepo historyChangeBookingStatusRepo;
     private final HotelRepository hotelRepository;
+    @Autowired
+    private VoucherRepository voucherRepository;
 
     public BookingResponseDTO create(BookingRequestDTO bookingDTO) {
         Booking booking = new Booking();
         mapDtoToEntity(bookingDTO, booking);
-        return mapEntityToResponse(bookingRepository.save(booking));
-    }
 
+        // ✅ nếu có voucherId thì gán voucher
+        if (bookingDTO.getVoucherIds() != null && !bookingDTO.getVoucherIds().isEmpty()) {
+            // Chuyển List<Long> -> String "1,2"
+            String joined = bookingDTO.getVoucherIds()
+                    .stream()
+                    .map(String::valueOf)
+                    .collect(Collectors.joining(","));
+            booking.setVoucherIds(joined);
+        }
+
+        Booking saved = bookingRepository.save(booking);
+        return mapEntityToResponse(saved);
+    }
     public List<BookingResponseDTO> all() {
         return bookingRepository.findAll()
                 .stream()
@@ -118,7 +136,8 @@ public class BookingService {
                 booking.getTotalPrice(),
                 getImageHotel(booking.getRoom().getHotel().getId()),
                 booking.getCreatedAt(),
-                booking.getUpdatedAt()
+                booking.getUpdatedAt(),
+                booking.getVoucherIds()
         );
     }
 
@@ -127,4 +146,42 @@ public class BookingService {
         return hotel.getImage();
     }
 
+    //loc bookinh lay bestchoice, co loc theo location
+    public List<HotelBookingCountDTO> getBestChoiceHotels() {
+        Pageable topFive = PageRequest.of(0, 5);
+        List<Object[]> results = bookingRepository.findTop5HotelsWithMostBookings(topFive);
+
+        return results.stream().map(row -> {
+            Hotel hotel = (Hotel) row[0];
+            Long totalBookings = (Long) row[1];
+
+            HotelBookingCountDTO dto = new HotelBookingCountDTO();
+            dto.setId(hotel.getId());
+            dto.setName(hotel.getName());
+            dto.setImage(hotel.getImage());
+            dto.setLocationName(hotel.getLocation().getName());
+            dto.setStatus(hotel.getStatus());
+            dto.setTotalBookings(totalBookings);
+            return dto;
+        }).toList();
+    }
+
+    public List<HotelBookingCountDTO> getBestChoiceHotelsByLocation(Long locationId) {
+        Pageable topFive = PageRequest.of(0, 5);
+        List<Object[]> results = bookingRepository.findTop5HotelsWithMostBookingsByLocation(locationId, topFive);
+
+        return results.stream().map(row -> {
+            Hotel hotel = (Hotel) row[0];
+            Long totalBookings = (Long) row[1];
+
+            HotelBookingCountDTO dto = new HotelBookingCountDTO();
+            dto.setId(hotel.getId());
+            dto.setName(hotel.getName());
+            dto.setImage(hotel.getImage());
+            dto.setLocationName(hotel.getLocation().getName());
+            dto.setStatus(hotel.getStatus());
+            dto.setTotalBookings(totalBookings);
+            return dto;
+        }).toList();
+    }
 }

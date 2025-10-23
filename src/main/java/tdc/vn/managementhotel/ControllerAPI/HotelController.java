@@ -10,9 +10,11 @@ import tdc.vn.managementhotel.dto.ApiResponse;
 import tdc.vn.managementhotel.dto.HotelDTO.HotelDTO;
 import tdc.vn.managementhotel.dto.HotelDTO.HotelResponseDTO;
 import tdc.vn.managementhotel.dto.RoomDTO.RoomResponseDTO;
+import tdc.vn.managementhotel.entity.Hotel;
 import tdc.vn.managementhotel.service.HotelService;
 import tdc.vn.managementhotel.service.RoomService;
 
+import java.math.BigDecimal;
 import java.util.List;
 @RestController
 @RequestMapping("/api/hotels")
@@ -21,6 +23,7 @@ import java.util.List;
 public class HotelController {
     private final HotelService hotelService;
     private final RoomService roomService;
+
 
     @PostMapping
     public ResponseEntity<HotelResponseDTO> createHotel(@RequestBody HotelDTO dto) {
@@ -62,4 +65,35 @@ public class HotelController {
     public ResponseEntity<ApiResponse> getHotelsByUser(@PathVariable Long id){
         return hotelService.getHotelsByUserId(id);
     }
+
+    //tim kiem
+    @GetMapping("/search")
+    public ResponseEntity<List<HotelResponseDTO>> searchHotels(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String city,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) BigDecimal minPrice,
+            @RequestParam(required = false) BigDecimal maxPrice
+    ) {
+        List<Hotel> hotels = hotelService.searchHotels(name, city, status, minPrice, maxPrice);
+
+        List<HotelResponseDTO> response = hotels.stream()
+                .map(hotel -> new HotelResponseDTO(
+                        hotel.getId(),
+                        hotel.getName(),
+                        hotel.getAddress(),
+                        hotel.getPhone(),
+                        hotel.getImage(),
+                        hotel.getEmail(),
+                        hotel.getStatus(),
+                        hotel.getLocation() != null ? hotel.getLocation().getName() : null,
+                        hotel.getMinPrice(),
+                        hotel.getMaxPrice()
+                ))
+                .toList();
+
+        return ResponseEntity.ok(response);
+    }
+
+
 }

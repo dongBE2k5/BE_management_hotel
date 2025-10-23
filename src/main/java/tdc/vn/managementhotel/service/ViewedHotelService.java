@@ -49,4 +49,15 @@ public class ViewedHotelService {
                 .map(v -> new HotelResponseDTO(v.getHotel())) // 👈 lấy từ entity Hotel
                 .collect(Collectors.toList());
     }
+
+    public List<HotelResponseDTO> getRecentlyViewedHotelsByLocation(Long userId, Long locationId) {
+        if (locationId == null) {
+            return getRecentlyViewedHotels(userId);
+        }
+        return viewedHotelRepository.findRecentlyViewedByUserAndLocation(userId, locationId)
+                .stream()
+                .map(HotelResponseDTO::new)
+                .collect(Collectors.toList());
+    }
+
 }
