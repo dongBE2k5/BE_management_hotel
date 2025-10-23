@@ -1,12 +1,15 @@
 package tdc.vn.managementhotel.ControllerAPI;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import tdc.vn.managementhotel.dto.BookingDTO.BookingRequestDTO;
 import tdc.vn.managementhotel.dto.BookingDTO.BookingResponseDTO;
 import tdc.vn.managementhotel.dto.BookingDTO.ChangeBookingStatusRequestDTO;
 import tdc.vn.managementhotel.dto.BookingDTO.ChangeBookingStatusResponseDTO;
+import tdc.vn.managementhotel.dto.HotelDTO.HotelBookingCountDTO;
+import tdc.vn.managementhotel.entity.Hotel;
 import tdc.vn.managementhotel.service.BookingService;
 import tdc.vn.managementhotel.service.HistoryChangeBookingStatusService;
 
@@ -74,4 +77,21 @@ public class BookingController {
 //        System.out.println(changeBookingStatusRequestDTO.toString());
 //        return ResponseEntity.ok(historyChangeBookingStatusService.store(changeBookingStatusRequestDTO));
 //    }
+
+    //bestchoice
+    @GetMapping("/best-choice")
+    public ResponseEntity<?> getBestChoiceHotels(@RequestParam(required = false) Long locationId) {
+        try {
+            List<HotelBookingCountDTO> hotels = (locationId != null)
+                    ? bookingService.getBestChoiceHotelsByLocation(locationId)
+                    : bookingService.getBestChoiceHotels();
+            return ResponseEntity.ok(hotels);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Lỗi khi lấy Best Choice Hotels: " + e.getMessage());
+        }
+    }
+
+
 }
