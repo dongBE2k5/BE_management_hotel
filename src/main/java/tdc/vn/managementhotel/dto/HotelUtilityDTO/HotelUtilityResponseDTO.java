@@ -13,6 +13,7 @@ public class HotelUtilityResponseDTO {
 
     @Data
     public static class UtilityItemResponse {
+        private Long id;
         private String utilityName;
         private BigDecimal price;
     }

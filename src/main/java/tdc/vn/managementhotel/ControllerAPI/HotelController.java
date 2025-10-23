@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import tdc.vn.managementhotel.dto.ApiResponse;
 import tdc.vn.managementhotel.dto.HotelDTO.HotelDTO;
 import tdc.vn.managementhotel.dto.HotelDTO.HotelResponseDTO;
 import tdc.vn.managementhotel.dto.RoomDTO.RoomResponseDTO;
@@ -20,7 +21,6 @@ import java.util.List;
 public class HotelController {
     private final HotelService hotelService;
     private final RoomService roomService;
-
 
     @PostMapping
     public ResponseEntity<HotelResponseDTO> createHotel(@RequestBody HotelDTO dto) {
@@ -56,5 +56,10 @@ public class HotelController {
     @GetMapping("/{hotelId}/rooms")
     public ResponseEntity<List<RoomResponseDTO>> getRoomsByHotel(@PathVariable Long hotelId) {
         return ResponseEntity.ok(roomService.getRoomsByHotel(hotelId));
+    }
+
+    @GetMapping("/user/{id}")
+    public ResponseEntity<ApiResponse> getHotelsByUser(@PathVariable Long id){
+        return hotelService.getHotelsByUserId(id);
     }
 }

@@ -2,9 +2,13 @@ package tdc.vn.managementhotel.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import tdc.vn.managementhotel.dto.ApiResponse;
 import tdc.vn.managementhotel.dto.HotelDTO.HotelDTO;
 import tdc.vn.managementhotel.dto.HotelDTO.HotelResponseDTO;
+import tdc.vn.managementhotel.dto.LocationDTO.LocationResponseDTO;
 import tdc.vn.managementhotel.entity.Hotel;
 import tdc.vn.managementhotel.entity.Location;
 import tdc.vn.managementhotel.entity.User;
@@ -14,6 +18,7 @@ import tdc.vn.managementhotel.repository.RoomRepository;
 import tdc.vn.managementhotel.repository.UserRepository;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -64,6 +69,20 @@ public class HotelService {
                 .map(this::mapEntityToResponse)
                 .collect(Collectors.toList());
     }
+
+    public ResponseEntity<ApiResponse> getHotelsByUserId(Long userId) {
+        ApiResponse<List<HotelResponseDTO>> response = new ApiResponse<>(
+                HttpStatus.CREATED.value(),
+                "Lấy danh sách khách sạn thành công",
+                hotelRepository.findByUserId(userId)
+                        .stream()
+                        .map(this::mapEntityToResponse)
+                        .collect(Collectors.toList()),
+                LocalDateTime.now()
+        );
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+
+    }
     // Get hotels by location
     public List<HotelResponseDTO> getHotelsByLocation(Long id) {
         return hotelRepository.findByLocationId(id)
@@ -102,7 +121,7 @@ public class HotelService {
                 hotel.getImage(),
                 hotel.getEmail(),
                 hotel.getStatus(),
-                hotel.getLocation().getName(),
+                new LocationResponseDTO(hotel.getLocation().getId(), hotel.getLocation().getName()),
                 priceRange.get("minPrice"),
                 priceRange.get("maxPrice")
 //                hotel.getUser().getUsername()

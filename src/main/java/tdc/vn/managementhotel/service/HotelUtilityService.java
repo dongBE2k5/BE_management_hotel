@@ -34,6 +34,7 @@ public class HotelUtilityService {
     private final UtilityRepository utilityRepository;
 
     public String save(HotelUtilityRequestDTO hotelUtilityRequestDTO) {
+        System.out.println("Save hotel utility");
         Hotel hotel = hotelRepository.findById(hotelUtilityRequestDTO.getHotelId())
                 .orElseThrow(() -> new ResourceNotFoundException("Hotel is not found"));
         List<HotelUtility> toSave = new ArrayList<>();
@@ -48,6 +49,7 @@ public class HotelUtilityService {
 
             toSave.add(hotelUtility);
         }
+        hotelUtilityRepository.saveAll(toSave);
         return "Đã thêm thành công";
     }
 
@@ -100,6 +102,7 @@ public class HotelUtilityService {
 
         for (HotelUtility hotelUtility : listHotelUtility) {
             HotelUtilityResponseDTO.UtilityItemResponse item = new HotelUtilityResponseDTO.UtilityItemResponse();
+            item.setId(hotelUtility.getUtility().getId());
             item.setUtilityName(hotelUtility.getUtility().getName());
             item.setPrice(hotelUtility.getPrice());
 

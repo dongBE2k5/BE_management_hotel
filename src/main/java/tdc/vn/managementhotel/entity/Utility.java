@@ -18,6 +18,7 @@ public class Utility {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
+    private String image;
     @Enumerated(EnumType.STRING)
     private UtilityType type;
     @OneToMany(mappedBy = "utility", cascade = CascadeType.ALL, orphanRemoval = true)
