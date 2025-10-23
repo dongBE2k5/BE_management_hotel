@@ -13,6 +13,7 @@ import tdc.vn.managementhotel.dto.VoucherDTO.VoucherResponseDTO;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -28,6 +29,7 @@ public class BookingResponseDTO {
     private String imageHotel;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private Long voucherId;
+    private String voucherIds;
+
 
 }

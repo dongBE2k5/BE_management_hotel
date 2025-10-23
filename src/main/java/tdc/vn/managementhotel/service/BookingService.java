@@ -40,10 +40,13 @@ public class BookingService {
         mapDtoToEntity(bookingDTO, booking);
 
         // ✅ nếu có voucherId thì gán voucher
-        if (bookingDTO.getVoucherId() != null) {
-            Voucher voucher = voucherRepository.findById(bookingDTO.getVoucherId())
-                    .orElseThrow(() -> new RuntimeException("Voucher không tồn tại"));
-            booking.setVoucher(voucher);
+        if (bookingDTO.getVoucherIds() != null && !bookingDTO.getVoucherIds().isEmpty()) {
+            // Chuyển List<Long> -> String "1,2"
+            String joined = bookingDTO.getVoucherIds()
+                    .stream()
+                    .map(String::valueOf)
+                    .collect(Collectors.joining(","));
+            booking.setVoucherIds(joined);
         }
 
         Booking saved = bookingRepository.save(booking);
@@ -134,7 +137,7 @@ public class BookingService {
                 getImageHotel(booking.getRoom().getHotel().getId()),
                 booking.getCreatedAt(),
                 booking.getUpdatedAt(),
-                booking.getVoucher() != null ? booking.getVoucher().getId() : null
+                booking.getVoucherIds()
         );
     }
 

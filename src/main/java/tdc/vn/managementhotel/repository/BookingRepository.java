@@ -50,4 +50,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
         ORDER BY COUNT(b) DESC
     """)
     List<Object[]> findTop5HotelsWithMostBookingsByLocation(@Param("locationId") Long locationId, Pageable pageable);
+
+
+ 
 }
