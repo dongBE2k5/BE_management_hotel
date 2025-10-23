@@ -25,9 +25,10 @@ import tdc.vn.managementhotel.util.JwtUtil;
 
 import java.util.Map;
 
-@CrossOrigin
+@CrossOrigin(originPatterns = "*", allowedHeaders = "*")
 @RestController
 @RequestMapping("/api/auth")
+
 public class AuthController {
 
     @Autowired

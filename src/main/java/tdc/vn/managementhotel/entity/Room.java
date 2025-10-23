@@ -31,6 +31,7 @@ public class Room {
     private Hotel hotel;
     private BigDecimal price;
 
+
 //    @OneToMany(mappedBy = "roomId", cascade = CascadeType.ALL, orphanRemoval = true)
 //    private List<ImageRoom> imageRoom = new ArrayList<>();
 

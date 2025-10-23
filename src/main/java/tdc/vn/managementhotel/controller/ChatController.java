@@ -23,5 +23,7 @@ public class ChatController {
         message.setTime(LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
         return message;
     }
+
+
 }
 

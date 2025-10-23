@@ -12,18 +12,21 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        // Prefix cho messages gửi từ server -> client
+        // Đây là các "topic" mà client sẽ lắng nghe
+        // Ví dụ: /topic/greetings, /topic/news
         config.enableSimpleBroker("/topic");
-        
-        // Prefix cho messages client -> server
+
+        // Đây là tiền tố cho các message đi từ client -> server
+        // Ví dụ: client gửi đến /app/hello
         config.setApplicationDestinationPrefixes("/app");
     }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        // Endpoint để client connect WebSocket
-        registry.addEndpoint("/ws-chat")
-                .setAllowedOrigins("http://localhost:3000") // Cho phép React connect
-                .withSockJS(); // Fallback nếu browser không hỗ trợ WebSocket
+        // Đây là endpoint mà client sẽ kết nối tới
+        // SockJS là một fallback cho trình duyệt không hỗ trợ WebSocket
+        registry.addEndpoint("/ws")
+                .setAllowedOriginPatterns("*")  // Cho phép tất cả các domain kết nối
+                .withSockJS();
     }
 }

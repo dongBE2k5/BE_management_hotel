@@ -39,6 +39,15 @@ public class DataInitializer {
                 userRole.setName("ROLE_EMPLOYEE");
                 roleRepository.save(userRole);
             }
+            if (roleRepository.findByName("ROLE_CLEANING").isEmpty()) {
+                Role userRole = new Role();
+                userRole.setName("ROLE_CLEANING");
+                roleRepository.save(userRole);
+            } if (roleRepository.findByName("ROLE_HOST").isEmpty()) {
+                Role userRole = new Role();
+                userRole.setName("ROLE_HOST");
+                roleRepository.save(userRole);
+            }
         };
     }
 }

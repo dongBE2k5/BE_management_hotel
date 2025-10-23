@@ -51,4 +51,6 @@ public class Hotel {
     @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ImageRoom> imageRooms = new ArrayList<>();
 
+    @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL,orphanRemoval = true)
+    private List<Employee> employees;
 }
