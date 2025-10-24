@@ -3,6 +3,7 @@ package tdc.vn.managementhotel.dto.HotelDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import tdc.vn.managementhotel.dto.LocationDTO.LocationResponseDTO;
 import tdc.vn.managementhotel.entity.Hotel;
 
 import java.math.BigDecimal;
@@ -18,7 +19,7 @@ public class HotelResponseDTO {
     private String image;
     private String email;
     private String status;
-    private String locationName;
+    private LocationResponseDTO location;
     private BigDecimal minPrice;
     private BigDecimal maxPrice;
     // private String userName;
@@ -32,7 +33,7 @@ public class HotelResponseDTO {
         this.image = hotel.getImage();
         this.email = hotel.getEmail();
         this.status = hotel.getStatus();
-        this.locationName = hotel.getLocation() != null ? hotel.getLocation().getName() : null;
+//        this.locationName = hotel.getLocation() != null ? hotel.getLocation().getName() : null;
         // this.userName = hotel.getUser() != null ? hotel.getUser().getName() : null;
     }
 }

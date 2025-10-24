@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import tdc.vn.managementhotel.dto.ApiResponse;
 import tdc.vn.managementhotel.dto.HotelDTO.HotelDTO;
 import tdc.vn.managementhotel.dto.HotelDTO.HotelResponseDTO;
 import tdc.vn.managementhotel.dto.RoomDTO.RoomResponseDTO;
@@ -60,6 +61,11 @@ public class HotelController {
         return ResponseEntity.ok(roomService.getRoomsByHotel(hotelId));
     }
 
+    @GetMapping("/user/{id}")
+    public ResponseEntity<ApiResponse> getHotelsByUser(@PathVariable Long id){
+        return hotelService.getHotelsByUserId(id);
+    }
+
     //tim kiem
     @GetMapping("/search")
     public ResponseEntity<List<HotelResponseDTO>> searchHotels(
@@ -69,24 +75,8 @@ public class HotelController {
             @RequestParam(required = false) BigDecimal minPrice,
             @RequestParam(required = false) BigDecimal maxPrice
     ) {
-        List<Hotel> hotels = hotelService.searchHotels(name, city, status, minPrice, maxPrice);
-
-        List<HotelResponseDTO> response = hotels.stream()
-                .map(hotel -> new HotelResponseDTO(
-                        hotel.getId(),
-                        hotel.getName(),
-                        hotel.getAddress(),
-                        hotel.getPhone(),
-                        hotel.getImage(),
-                        hotel.getEmail(),
-                        hotel.getStatus(),
-                        hotel.getLocation() != null ? hotel.getLocation().getName() : null,
-                        hotel.getMinPrice(),
-                        hotel.getMaxPrice()
-                ))
-                .toList();
-
-        return ResponseEntity.ok(response);
+        List<HotelResponseDTO> hotels = hotelService.searchHotels(name, city, status, minPrice, maxPrice);
+        return ResponseEntity.ok(hotels);
     }
 
 

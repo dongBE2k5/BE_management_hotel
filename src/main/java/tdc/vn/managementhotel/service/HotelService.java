@@ -2,9 +2,13 @@ package tdc.vn.managementhotel.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import tdc.vn.managementhotel.dto.ApiResponse;
 import tdc.vn.managementhotel.dto.HotelDTO.HotelDTO;
 import tdc.vn.managementhotel.dto.HotelDTO.HotelResponseDTO;
+import tdc.vn.managementhotel.dto.LocationDTO.LocationResponseDTO;
 import tdc.vn.managementhotel.entity.Hotel;
 import tdc.vn.managementhotel.entity.Location;
 import tdc.vn.managementhotel.entity.Room;
@@ -15,6 +19,7 @@ import tdc.vn.managementhotel.repository.RoomRepository;
 import tdc.vn.managementhotel.repository.UserRepository;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -74,6 +79,20 @@ public class HotelService {
                 .collect(Collectors.toList());
     }
 
+    public ResponseEntity<ApiResponse> getHotelsByUserId(Long userId) {
+        ApiResponse<List<HotelResponseDTO>> response = new ApiResponse<>(
+                HttpStatus.CREATED.value(),
+                "Lấy danh sách khách sạn thành công",
+                hotelRepository.findByUserId(userId)
+                        .stream()
+                        .map(this::mapEntityToResponse)
+                        .collect(Collectors.toList()),
+                LocalDateTime.now()
+        );
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+
+    }
+
     // Map DTO → Entity
     private void mapDtoToEntity(HotelDTO dto, Hotel hotel) {
         hotel.setName(dto.getName());
@@ -104,14 +123,14 @@ public class HotelService {
                 hotel.getImage(),
                 hotel.getEmail(),
                 hotel.getStatus(),
-                hotel.getLocation().getName(),
+                new LocationResponseDTO(hotel.getLocation().getId(), hotel.getLocation().getName()),
                 priceRange.get("minPrice"),
                 priceRange.get("maxPrice")
 //                hotel.getUser().getUsername()
         );
     }
     // tim kiem form
-    public List<Hotel> searchHotels(String name, String city, String status, BigDecimal minPrice, BigDecimal maxPrice) {
+    public List<HotelResponseDTO> searchHotels(String name, String city, String status, BigDecimal minPrice, BigDecimal maxPrice) {
         if (name != null && name.trim().isEmpty()) name = null;
         if (city != null && city.trim().isEmpty()) city = null;
         if (status != null && status.trim().isEmpty()) status = null;
@@ -140,7 +159,22 @@ public class HotelService {
                     .collect(Collectors.toList());
         }
 
-        return hotels;
+        List<HotelResponseDTO> response = hotels.stream()
+                .map(hotel -> new HotelResponseDTO(
+                        hotel.getId(),
+                        hotel.getName(),
+                        hotel.getAddress(),
+                        hotel.getPhone(),
+                        hotel.getImage(),
+                        hotel.getEmail(),
+                        hotel.getStatus(),
+                        new LocationResponseDTO(hotel.getLocation().getId(), hotel.getLocation().getName()),
+                        hotel.getMinPrice(),
+                        hotel.getMaxPrice()
+                ))
+                .toList();
+
+        return response;
     }
 
 
