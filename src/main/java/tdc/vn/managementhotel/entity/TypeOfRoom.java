@@ -1,14 +1,14 @@
 package tdc.vn.managementhotel.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import tdc.vn.managementhotel.enums.TypeRoom;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Data
@@ -27,5 +27,15 @@ public class TypeOfRoom {
 
     @OneToMany(mappedBy = "roomType", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ImageRoom> imageRooms;
+
+    @OneToMany(
+            mappedBy = "typeOfRoom",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private Set<TypeOfRoomItem> typeOfRoomItems = new HashSet<>();
+
+
+
 
 }

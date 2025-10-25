@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- Thêm namespace của Thymeleaf -->
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
@@ -20,64 +21,70 @@
         }
     </style>
 </head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+<body class="bg-gray-100 flex items-center justify-center min-h-screen py-8">
 
 <div class="bg-white p-8 rounded-xl shadow-lg w-full max-w-md">
     <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Tạo Tài Khoản</h1>
 
-    <!-- Biểu mẫu đăng ký -->
-    <form id="registrationForm" novalidate>
+    <!-- Hiển thị thông báo lỗi từ server (ví dụ: username đã tồn tại) -->
+    <div th:if="${error}" class="mb-4 p-3 bg-red-100 border border-red-300 text-red-700 rounded-md text-sm text-center">
+        <p th:text="${error}"></p>
+    </div>
+
+    <!--
+      Biểu mẫu đăng ký với Thymeleaf
+      - th:action="@{/register}" trỏ đến controller của bạn.
+      - th:object="${registerRequest}" liên kết form với model attribute.
+    -->
+    <form id="registrationForm" th:action="@{/register}" th:object="${registerRequest}" method="post" novalidate>
         <div class="space-y-4">
+
             <!-- Họ và Tên -->
             <div>
                 <label for="fullName" class="block text-sm font-medium text-gray-700 mb-1">Họ và Tên</label>
-                <input type="text" id="fullName" name="fullName" placeholder="Nguyễn Văn A" required
+                <input type="text" id="fullName" th:field="*{fullName}" placeholder="Nguyễn Văn A" required
                        class="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 transition duration-200">
             </div>
 
             <!-- Số Điện Thoại -->
             <div>
                 <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Số Điện Thoại</label>
-                <input type="tel" id="phone" name="phone" placeholder="0901234567" required
+                <input type="tel" id="phone" th:field="*{phone}" placeholder="0901234567" required
                        class="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 transition duration-200">
             </div>
 
             <!-- Email -->
             <div>
                 <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                <input type="email" id="email" name="email" placeholder="ban@email.com" required
+                <input type="email" id="email" th:field="*{email}" placeholder="ban@email.com" required
                        class="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 transition duration-200">
             </div>
 
             <!-- Tên Tài Khoản -->
             <div>
                 <label for="username" class="block text-sm font-medium text-gray-700 mb-1">Tên Tài Khoản</label>
-                <input type="text" id="username" name="username" placeholder="nguyenvana" required
+                <input type="text" id="username" th:field="*{username}" placeholder="nguyenvana" required
                        class="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 transition duration-200">
             </div>
 
             <!-- Mật Khẩu -->
             <div>
                 <label for="password" class="block text-sm font-medium text-gray-700 mb-1">Mật Khẩu</label>
-                <input type="password" id="password" name="password" placeholder="••••••••" required
+                <input type="password" id="password" th:field="*{password}" placeholder="••••••••" required
                        class="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 transition duration-200">
             </div>
 
             <!-- Nhập Lại Mật Khẩu -->
             <div>
                 <label for="confirmPassword" class="block text-sm font-medium text-gray-700 mb-1">Nhập Lại Mật Khẩu</label>
+                <!-- Đã gỡ bỏ th:field, chỉ giữ lại name và id -->
                 <input type="password" id="confirmPassword" name="confirmPassword" placeholder="••••••••" required
                        class="w-full p-3 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 transition duration-200">
             </div>
 
-            <!-- Thông báo lỗi mật khẩu -->
+            <!-- Thông báo lỗi mật khẩu phía máy khách -->
             <div id="passwordError" class="error-message text-red-600 text-sm">
                 Mật khẩu nhập lại không khớp. Vui lòng thử lại.
-            </div>
-
-            <!-- Thông báo thành công -->
-            <div id="successMessage" class="error-message text-green-600 text-sm font-medium text-center">
-                Đăng ký thành công!
             </div>
 
             <!-- Nút Đăng Ký -->
@@ -91,17 +98,16 @@
     </form>
 </div>
 
+<!-- Thêm script kiểm tra mật khẩu phía máy khách -->
 <script>
     const form = document.getElementById('registrationForm');
     const password = document.getElementById('password');
     const confirmPassword = document.getElementById('confirmPassword');
     const passwordError = document.getElementById('passwordError');
-    const successMessage = document.getElementById('successMessage');
 
     // Hàm để hiển thị lỗi
     function showError() {
         passwordError.style.display = 'block';
-        successMessage.style.display = 'none';
         password.classList.add('border-red-500');
         confirmPassword.classList.add('border-red-500');
     }
@@ -113,75 +119,24 @@
         confirmPassword.classList.remove('border-red-500');
     }
 
-    // Hàm để hiển thị thành công
-    function showSuccess() {
-        successMessage.style.display = 'block';
-        passwordError.style.display = 'none';
-        password.classList.remove('border-red-500');
-        confirmPassword.classList.remove('border-red-500');
-    }
-
     // Xóa lỗi khi người dùng gõ
     password.addEventListener('input', clearError);
     confirmPassword.addEventListener('input', clearError);
 
     // Xử lý khi gửi biểu mẫu
     form.addEventListener('submit', function (event) {
-        // Ngăn chặn biểu mẫu gửi đi
-        event.preventDefault();
-
-        // Xóa thông báo thành công cũ (nếu có)
-        successMessage.style.display = 'none';
-
-        // Kiểm tra các trường bắt buộc (HTML5 'required' sẽ xử lý hầu hết)
-        let allFieldsValid = true;
-        const inputs = form.querySelectorAll('input[required]');
-        inputs.forEach(input => {
-            if (!input.value) {
-                allFieldsValid = false;
-                // Thêm viền đỏ cho trường trống
-                input.classList.add('border-red-500');
-            } else {
-                input.classList.remove('border-red-500');
-            }
-        });
-
-        if (!allFieldsValid) {
-            // Không làm gì thêm nếu có trường trống
-            return;
-        }
-
         // Kiểm tra mật khẩu
         if (password.value !== confirmPassword.value) {
+            // Ngăn chặn biểu mẫu gửi đi
+            event.preventDefault();
             showError();
         } else {
             clearError();
-            // Đây là nơi bạn sẽ gửi dữ liệu đến máy chủ
-            // Để mô phỏng, chúng ta sẽ hiển thị thông báo thành công
-            console.log('Biểu mẫu hợp lệ. Đang gửi...');
-            console.log({
-                fullName: document.getElementById('fullName').value,
-                phone: document.getElementById('phone').value,
-                email: document.getElementById('email').value,
-                username: document.getElementById('username').value,
-            });
-
-            showSuccess();
-
-            // Tùy chọn: Xóa biểu mẫu sau khi thành công
-            // form.reset();
+            // Nếu mật khẩu khớp, biểu mẫu sẽ được gửi đi bình thường
         }
-    });
-
-    // Xóa viền đỏ khi người dùng bắt đầu nhập
-    form.querySelectorAll('input[required]').forEach(input => {
-        input.addEventListener('input', () => {
-            if (input.value) {
-                input.classList.remove('border-red-500');
-            }
-        });
     });
 </script>
 
 </body>
 </html>
+

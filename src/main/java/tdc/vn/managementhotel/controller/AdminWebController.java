@@ -20,14 +20,28 @@ public class AdminWebController {
     }
 
     @GetMapping("register")
-    public String register() {
+    public String register(Model model) {
+        model.addAttribute("registerRequest", new RegisterRequest());
         return "register";
     }
+    @GetMapping("/hosts")
+    public String showHostManagement(Model model) {
 
+        // Lấy danh sách host từ service
+//        List<Host> hostList = hostService.findAll();
+
+        // Thêm các thuộc tính cho Thymeleaf
+        model.addAttribute("hosts", "hostList");
+        model.addAttribute("activePage", "hosts");
+        model.addAttribute("pageTitle", "Quản lý Host");
+
+        // Trả về tên của tệp HTML (không có .html)
+        return "admin-dashboard";
+    }
     @PostMapping("/register")
-    public String handleRegister(@ModelAttribute RegisterRequest req, Model model) {
+    public String handleRegister(@ModelAttribute RegisterRequest registerRequest, Model model) {
         try {
-            userService.registerHost(req);
+            userService.registerHost(registerRequest);
             model.addAttribute("success", "Đăng ký thành công!");
             return "login"; // chuyển sang trang login
         } catch (RuntimeException ex) {
