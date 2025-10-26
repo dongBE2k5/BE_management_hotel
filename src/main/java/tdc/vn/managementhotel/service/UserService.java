@@ -12,6 +12,13 @@ import tdc.vn.managementhotel.entity.Room;
 import tdc.vn.managementhotel.entity.User;
 import tdc.vn.managementhotel.repository.RoleRepository;
 import tdc.vn.managementhotel.repository.UserRepository;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 
 import java.util.regex.Pattern;
 
@@ -26,6 +33,12 @@ public class UserService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private JavaMailSender mailSender;
+
+    private final Map<String, String> otpStorage = new HashMap<>();
+    private final Map<String, LocalDateTime> otpExpiry = new HashMap<>();
 
     /**
      * Đăng ký user mới với role mặc định ROLE_USER
@@ -140,4 +153,89 @@ public class UserService {
                 user.getRole()
         );
     }
+    //ham doi mat khau
+    public UserResponse changePassword(Long userId, String oldPassword, String newPassword) {
+        // Tìm user theo ID
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy user với ID: " + userId));
+
+        // Kiểm tra mật khẩu cũ có khớp không
+        if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
+            throw new RuntimeException("Mật khẩu cũ không đúng!");
+        }
+
+        // Không cho phép dùng lại mật khẩu cũ
+        if (passwordEncoder.matches(newPassword, user.getPassword())) {
+            throw new RuntimeException("Mật khẩu mới không được trùng với mật khẩu cũ!");
+        }
+
+        // Kiểm tra định dạng mật khẩu mới
+        if (!PASSWORD_PATTERN.matcher(newPassword).matches()) {
+            throw new RuntimeException("Mật khẩu mới không hợp lệ! " +
+                    "Phải có ít nhất 6 ký tự, 1 chữ in hoa và 1 ký tự đặc biệt, không có khoảng trắng.");
+        }
+
+        // Mã hóa mật khẩu mới
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        return mapEntityToResponse(user);
+    }
+    //
+    public String resetPassword(String email, String newPassword) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("Không tìm thấy tài khoản với email: " + email));
+
+        if (!PASSWORD_PATTERN.matcher(newPassword).matches()) {
+            throw new RuntimeException("Mật khẩu mới không hợp lệ! " +
+                    "Phải có ít nhất 6 ký tự, 1 chữ in hoa và 1 ký tự đặc biệt, không có khoảng trắng.");
+        }
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        return "Đặt lại mật khẩu thành công!";
+    }
+    public void sendOtpToEmail(String email) {
+        // Kiểm tra email có tồn tại trong hệ thống không
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng với email: " + email));
+
+        // Tạo mã OTP ngẫu nhiên 6 chữ số
+        String otp = String.format("%06d", new Random().nextInt(999999));
+
+        // Lưu OTP và thời gian hết hạn (5 phút)
+        otpStorage.put(email, otp);
+        otpExpiry.put(email, LocalDateTime.now().plusMinutes(5));
+
+        // Gửi mail
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(email);
+        message.setSubject("Mã OTP xác thực từ Management Hotel");
+        message.setText("Xin chào " + user.getFullName() + ",\n\n"
+                + "Mã OTP của bạn là: " + otp + "\n"
+                + "Mã này sẽ hết hạn sau 5 phút.\n\n"
+                + "Trân trọng,\nĐội ngũ Management Hotel");
+
+        mailSender.send(message);
+    }
+    public boolean verifyOtp(String email, String otp) {
+        if (!otpStorage.containsKey(email)) {
+            return false;
+        }
+
+        String storedOtp = otpStorage.get(email);
+        LocalDateTime expiry = otpExpiry.get(email);
+
+        // Kiểm tra đúng mã và chưa hết hạn
+        if (storedOtp.equals(otp) && expiry.isAfter(LocalDateTime.now())) {
+            // Xóa OTP sau khi dùng
+            otpStorage.remove(email);
+            otpExpiry.remove(email);
+            return true;
+        }
+
+        return false;
+    }
+
 }

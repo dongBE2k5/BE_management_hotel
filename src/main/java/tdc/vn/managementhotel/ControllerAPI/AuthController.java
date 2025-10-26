@@ -22,6 +22,8 @@ import tdc.vn.managementhotel.service.CustomUserDetailsService;
 import tdc.vn.managementhotel.service.JwtBlacklistService;
 import tdc.vn.managementhotel.service.UserService;
 import tdc.vn.managementhotel.util.JwtUtil;
+import tdc.vn.managementhotel.dto.UserDTO.ChangePasswordRequest;
+import tdc.vn.managementhotel.dto.UserDTO.ForgotPasswordRequest;
 
 import java.util.Map;
 
@@ -117,5 +119,35 @@ public class AuthController {
     }
 
 
+    @PutMapping("/change-password/{userId}")
+    public ResponseEntity<?> changePassword(
+            @PathVariable Long userId,
+            @RequestBody ChangePasswordRequest req) {
+        try {
+            UserResponse response = userService.changePassword(userId, req.getOldPassword(), req.getNewPassword());
+            return ResponseEntity.ok(Map.of("success", true, "message", "Đổi mật khẩu thành công!", "data", response));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", e.getMessage()));
+        }
+    }
+
+
+
+    @PostMapping("/send-otp")
+    public ResponseEntity<?> sendOtp(@RequestBody Map<String, String> body) {
+        String email = body.get("email");
+        userService.sendOtpToEmail(email);
+        return ResponseEntity.ok("OTP đã gửi đến email");
+    }
+
+    @PostMapping("/verify-otp")
+    public ResponseEntity<?> verifyOtp(@RequestBody ForgotPasswordRequest req) {
+        boolean valid = userService.verifyOtp(req.getEmail(), req.getOtp());
+        if (!valid) {
+            return ResponseEntity.badRequest().body("OTP không hợp lệ");
+        }
+        userService.resetPassword(req.getEmail(), req.getNewPassword());
+        return ResponseEntity.ok("Đặt lại mật khẩu thành công");
+    }
 
 }
