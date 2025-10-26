@@ -4,6 +4,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import tdc.vn.managementhotel.dto.HotelDTO.HotelResponseDTO;
+import tdc.vn.managementhotel.dto.LocationDTO.LocationResponseDTO;
 import tdc.vn.managementhotel.entity.Hotel;
 import tdc.vn.managementhotel.entity.SavedHotel;
 import tdc.vn.managementhotel.repository.HotelRepository;
@@ -50,7 +51,7 @@ public class SavedHotelService {
                                 hotel.getImage(),
                                 hotel.getEmail(),
                                 hotel.getStatus(),
-                                hotel.getLocation().getName(),
+                                new LocationResponseDTO(hotel.getLocation().getId(), hotel.getLocation().getName()),
                                 hotel.getMinPrice(),
                                 hotel.getMaxPrice()
                         ))
@@ -81,7 +82,7 @@ public class SavedHotelService {
                         hotel.getEmail(),
                         hotel.getStatus(),
                         // Chắc chắn Location đã được tải
-                        hotel.getLocation().getName(),
+                        new LocationResponseDTO(hotel.getLocation().getId(), hotel.getLocation().getName()),
                         hotel.getMinPrice(),
                         hotel.getMaxPrice()
                 ))
