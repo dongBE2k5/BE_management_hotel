@@ -30,6 +30,7 @@ public class RequestControllerAPI {
     @PostMapping
     public ResponseEntity<Request> create(@RequestBody Request req) {
         Request saved = repo.save(req);
+
         // Gửi realtime tới B
         messagingTemplate.convertAndSend("/topic/user." + req.getReceiverId(), saved);
         return ResponseEntity.ok(saved);

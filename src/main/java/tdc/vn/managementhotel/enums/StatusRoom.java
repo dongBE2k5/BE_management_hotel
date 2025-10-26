@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 public enum StatusRoom {
     AVAILABLE,
     USED,
-    MAINTENANCE
-
+    MAINTENANCE,
+    REQUEST,
+    CLEANING,
+    NEEDCLEANING
 }

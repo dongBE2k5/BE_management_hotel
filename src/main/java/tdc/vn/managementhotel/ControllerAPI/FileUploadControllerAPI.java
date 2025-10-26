@@ -6,17 +6,35 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import tdc.vn.managementhotel.service.FileUploadService;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/upload")
 @RequiredArgsConstructor
 public class FileUploadControllerAPI {
     private final FileUploadService fileUploadService;
-
-    @PostMapping
+    // Upload 1 file (vẫn giữ lại nếu cần)
+    @PostMapping("/single")
     public ResponseEntity<String> uploadImage(@RequestParam("file") MultipartFile file) {
         try {
             String path = fileUploadService.uploadImage(file);
             return ResponseEntity.ok("Upload thành công: " + path);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Lỗi upload: " + e.getMessage());
+        }
+    }
+
+    // Upload nhiều file
+    @PostMapping("/multiple")
+    public ResponseEntity<?> uploadMultipleImages(@RequestParam("files") MultipartFile[] files) {
+        List<String> uploadedPaths = new ArrayList<>();
+        try {
+            for (MultipartFile file : files) {
+                String path = fileUploadService.uploadImage(file);
+                uploadedPaths.add(path);
+            }
+            return ResponseEntity.ok("Upload thành công: " +uploadedPaths);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Lỗi upload: " + e.getMessage());
         }
