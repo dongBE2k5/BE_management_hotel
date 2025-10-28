@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -26,6 +27,13 @@ public class Item {
             orphanRemoval = true
     )
     private Set<TypeOfRoomItem> typeOfRoomItems = new HashSet<>();
+
+    @OneToMany(
+            mappedBy = "item",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private List<DamagedItem> DamgedItem;
 
 
 

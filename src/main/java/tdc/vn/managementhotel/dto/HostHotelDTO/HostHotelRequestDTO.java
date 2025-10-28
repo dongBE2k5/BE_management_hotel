@@ -1,22 +1,17 @@
-package tdc.vn.managementhotel.entity;
+package tdc.vn.managementhotel.dto.HostHotelDTO;
 
-import jakarta.persistence.*;
+
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Entity
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class HostHotel {
-    @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
-    private Long id;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+@NoArgsConstructor
+@Builder
+public class HostHotelRequestDTO {
+    private Long userId;
     private String stk;
     private String nganHang;
     private String chiNhanh;
@@ -24,5 +19,4 @@ public class HostHotel {
     private String cccdMatTruoc;
     private String cccdMatSau;
     private String giayPhepKinhDoanh;
-
 }

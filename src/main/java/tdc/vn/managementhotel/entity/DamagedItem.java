@@ -1,5 +1,6 @@
 package tdc.vn.managementhotel.entity;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -32,9 +33,13 @@ public class DamagedItem {
     @Enumerated(EnumType.STRING)
     private DamageStatus status; // DAMAGED hoặc MISSING
 
+    @Nullable
+    private String image;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id",nullable = false)
+    private User user;
 
-    private String reportedBy;
 
     private LocalDateTime reportedAt = LocalDateTime.now();
 }

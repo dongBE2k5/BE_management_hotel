@@ -14,6 +14,6 @@ import java.io.Serializable;
 @NoArgsConstructor
 
 public class RoomTypeItemID implements Serializable {
-    private int typeOfRoomId;
-    private int itemId;
+    private Long typeOfRoomId;
+    private Long itemId;
 }
