@@ -19,7 +19,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/hotels")
 @RequiredArgsConstructor
-@CrossOrigin
+@CrossOrigin(originPatterns = "*", allowedHeaders = "*")
 public class HotelController {
     private final HotelService hotelService;
     private final RoomService roomService;

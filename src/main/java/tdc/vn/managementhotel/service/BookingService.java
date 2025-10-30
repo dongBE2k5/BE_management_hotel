@@ -4,7 +4,9 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import tdc.vn.managementhotel.dto.BookingDTO.BookingRequestDTO;
 import tdc.vn.managementhotel.dto.BookingDTO.BookingResponseDTO;
 import tdc.vn.managementhotel.dto.BookingDTO.ChangeBookingStatusRequestDTO;
@@ -32,9 +34,12 @@ public class BookingService {
     private final RoomRepository roomRepository;
     private final HistoryChangeBookingStatusRepo historyChangeBookingStatusRepo;
     private final HotelRepository hotelRepository;
+    private final SimpMessagingTemplate messagingTemplate;
+
     @Autowired
     private VoucherRepository voucherRepository;
 
+    @Transactional
     public BookingResponseDTO create(BookingRequestDTO bookingDTO) {
         Booking booking = new Booking();
         mapDtoToEntity(bookingDTO, booking);
@@ -50,6 +55,9 @@ public class BookingService {
         }
 
         Booking saved = bookingRepository.save(booking);
+
+        // 🚀 Gửi realtime đến tất cả client đang lắng nghe "/topic/booking"
+        messagingTemplate.convertAndSend("/topic/booking", saved);
         return mapEntityToResponse(saved);
     }
     public List<BookingResponseDTO> all() {

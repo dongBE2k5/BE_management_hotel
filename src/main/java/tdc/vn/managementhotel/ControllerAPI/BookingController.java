@@ -15,10 +15,11 @@ import tdc.vn.managementhotel.service.HistoryChangeBookingStatusService;
 
 import java.util.List;
 
-@CrossOrigin
+
 @RestController
 @RequestMapping("/api/bookings")
 @RequiredArgsConstructor
+@CrossOrigin(originPatterns = "*", allowedHeaders = "*")
 public class BookingController {
     private final BookingService bookingService;
     private final HistoryChangeBookingStatusService historyChangeBookingStatusService;

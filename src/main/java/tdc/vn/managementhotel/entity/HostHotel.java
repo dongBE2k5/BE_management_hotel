@@ -2,13 +2,16 @@ package tdc.vn.managementhotel.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import tdc.vn.managementhotel.enums.HostHotelStatus;
 
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class HostHotel {
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
@@ -24,5 +27,6 @@ public class HostHotel {
     private String cccdMatTruoc;
     private String cccdMatSau;
     private String giayPhepKinhDoanh;
+    private HostHotelStatus status;
 
 }

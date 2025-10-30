@@ -1,5 +1,6 @@
 package tdc.vn.managementhotel.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -24,10 +25,12 @@ public class Booking {
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name="user_id", nullable = false)
+    @JsonIgnore
     private User user;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name="room_id", nullable = false)
+    @JsonIgnore
     private Room room;
 
     //  Thêm voucher nếu có

@@ -9,6 +9,7 @@ import tdc.vn.managementhotel.dto.HostHotelDTO.HostHotelResponseDTO;
 
 import tdc.vn.managementhotel.entity.HostHotel;
 import tdc.vn.managementhotel.entity.User;
+import tdc.vn.managementhotel.enums.HostHotelStatus;
 import tdc.vn.managementhotel.repository.HostHotelRepository;
 import tdc.vn.managementhotel.repository.UserRepository;
 
@@ -46,7 +47,7 @@ public class HostHotelService {
         hostHotel.setCccdMatTruoc(dto.getCccdMatTruoc());
         hostHotel.setCccdMatSau(dto.getCccdMatSau());
         hostHotel.setGiayPhepKinhDoanh(dto.getGiayPhepKinhDoanh());
-
+        hostHotel.setStatus(HostHotelStatus.VERIFIED);
         HostHotel saved = hostHotelRepository.save(hostHotel);
         return mapToResponse(saved);
     }
@@ -60,6 +61,13 @@ public class HostHotelService {
                 .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy thông tin HostHotel cho userId: " + userId));
 
         return mapToResponse(hostHotel);
+    }
+    public HostHotelResponseDTO updateStatus(Long userId, HostHotelStatus status) {
+        HostHotel hostHotel = hostHotelRepository.findByUserId(userId)
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy thông tin HostHotel cho userId: " + userId));
+        hostHotel.setStatus(status);
+        HostHotel saved= hostHotelRepository.save(hostHotel);
+        return mapToResponse(saved);
     }
 
     /**
