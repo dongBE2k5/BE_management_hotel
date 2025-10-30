@@ -35,6 +35,10 @@ public class Room {
     private  List<DamagedItem> damagedItems;
 
 
+    @OneToMany(mappedBy = "room",cascade = CascadeType.ALL,orphanRemoval = true)
+    private  List<RoomAssignment> roomAssignments;
+
+
 //    @OneToMany(mappedBy = "roomId", cascade = CascadeType.ALL, orphanRemoval = true)
 //    private List<ImageRoom> imageRoom = new ArrayList<>();
 

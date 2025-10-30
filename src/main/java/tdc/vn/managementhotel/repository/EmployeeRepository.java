@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 
+@Repository
 public interface EmployeeRepository extends JpaRepository<Employee, Long> {
 
     List<Employee> findAllByHotelId(Long hotelId);

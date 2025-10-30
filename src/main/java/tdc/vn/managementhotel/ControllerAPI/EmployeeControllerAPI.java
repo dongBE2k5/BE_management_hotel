@@ -27,11 +27,11 @@ public class EmployeeControllerAPI {
         return ResponseEntity.ok().body(employeeService.createEmployee(employeeResquestDTO));
     }
 
-    @GetMapping("{hotelID}/hotel")
+    @GetMapping("/{hotelID}/hotel")
     public ResponseEntity<List<EmployeeResponseDTO>> getEmployeeByHotelId(@PathVariable Long hotelID) {
         return  ResponseEntity.ok(employeeService.findEmployeeByHotelId(hotelID));
     }
-    @GetMapping("{userID}/user")
+    @GetMapping("/{userID}/user")
     public  ResponseEntity<EmployeeResponseDTO> getEmployeeByUserId(@PathVariable Long userID) {
         return  ResponseEntity.ok(employeeService.findEmployeeByUserId(userID));
 

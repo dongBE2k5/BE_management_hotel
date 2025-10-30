@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import tdc.vn.managementhotel.entity.Hotel;
 import tdc.vn.managementhotel.entity.User;
+import tdc.vn.managementhotel.enums.Position;
 
 @Data
 @NoArgsConstructor
@@ -14,6 +15,6 @@ public class EmployeeResquestDTO {
     private Long id;
     private User userId;
     private Hotel hotelId;
-    private String position;
+    private Position position;
 
 }

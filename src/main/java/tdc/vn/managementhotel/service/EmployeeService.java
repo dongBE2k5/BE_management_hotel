@@ -7,7 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import tdc.vn.managementhotel.dto.EmployeeDTO.EmployeeResponseDTO;
 import tdc.vn.managementhotel.dto.EmployeeDTO.EmployeeResquestDTO;
+import tdc.vn.managementhotel.dto.UserDTO.UserResponse;
 import tdc.vn.managementhotel.entity.Employee;
+import tdc.vn.managementhotel.entity.User;
 import tdc.vn.managementhotel.repository.EmployeeRepository;
 
 import java.util.List;
@@ -17,7 +19,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class EmployeeService {
 
-    private EmployeeRepository employeeRepository;
+    private final EmployeeRepository employeeRepository;
 
     //    created
     public EmployeeResponseDTO createEmployee(EmployeeResquestDTO employeeResquestDTO) {
@@ -69,8 +71,11 @@ public class EmployeeService {
 
     // Map Entity → Response DTO
     private EmployeeResponseDTO mapEntityToResponse(Employee employee) {
-        return new EmployeeResponseDTO(employee.getHotel().getId(),
-                employee.getPosition()
+            User user = employee.getUser();
+        return new EmployeeResponseDTO(
+                new UserResponse(user.getId(),user.getFullName(),user.getUsername(),user.getEmail(),user.getPhone(),user.getCccd(),user.getRole()),
+                employee.getHotel().getId(),
+                employee.getPosition().toString()
         );
     }
 

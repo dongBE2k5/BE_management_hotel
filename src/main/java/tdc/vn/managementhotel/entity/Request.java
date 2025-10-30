@@ -23,7 +23,7 @@ public class Request {
 
 
     @Enumerated(EnumType.STRING)
-    private RequestStatus status = RequestStatus.PENDING;
+    private RequestStatus status = RequestStatus.SENT;
 
     private LocalDateTime createdAt = LocalDateTime.now();
     private LocalDateTime updatedAt = LocalDateTime.now();
