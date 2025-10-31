@@ -14,18 +14,18 @@ import org.springframework.web.bind.annotation.*;
 import tdc.vn.managementhotel.dto.JwtAuthenticationResponse;
 import tdc.vn.managementhotel.dto.LoginRequest;
 import tdc.vn.managementhotel.dto.RegisterRequest;
-import tdc.vn.managementhotel.dto.UserDTO.UserLoginResponse;
-import tdc.vn.managementhotel.dto.UserDTO.UserResponse;
+import tdc.vn.managementhotel.dto.UserDTO.*;
 import tdc.vn.managementhotel.entity.Role;
+import tdc.vn.managementhotel.entity.User;
 import tdc.vn.managementhotel.model.CustomUserDetails;
+import tdc.vn.managementhotel.repository.UserRepository;
 import tdc.vn.managementhotel.service.CustomUserDetailsService;
 import tdc.vn.managementhotel.service.JwtBlacklistService;
 import tdc.vn.managementhotel.service.UserService;
 import tdc.vn.managementhotel.util.JwtUtil;
-import tdc.vn.managementhotel.dto.UserDTO.ChangePasswordRequest;
-import tdc.vn.managementhotel.dto.UserDTO.ForgotPasswordRequest;
 
 import java.util.Map;
+import java.util.Optional;
 
 @CrossOrigin
 @RestController
@@ -37,6 +37,8 @@ public class AuthController {
     @Autowired private JwtUtil jwtUtil;
     @Autowired private UserService userService;
 
+    @Autowired
+    private UserRepository userRepository;
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest req) {
         try {
@@ -148,6 +150,25 @@ public class AuthController {
         }
         userService.resetPassword(req.getEmail(), req.getNewPassword());
         return ResponseEntity.ok("Đặt lại mật khẩu thành công");
+    }
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateUser(@PathVariable Long id, @RequestBody UserUpdateDTO dto) {
+        Optional<User> optionalUser = userRepository.findById(id); //
+        if (optionalUser.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        User user = optionalUser.get();
+        user.setFullName(dto.getFullName());
+        user.setEmail(dto.getEmail());
+        user.setPhone(dto.getPhone());
+        user.setCccd(dto.getCccd());
+        user.setGender(dto.getGender());
+        user.setBirthDate(dto.getBirthDate());
+        user.setAddress(dto.getAddress());
+
+        userRepository.save(user); //
+        return ResponseEntity.ok(user);
     }
 
 }
