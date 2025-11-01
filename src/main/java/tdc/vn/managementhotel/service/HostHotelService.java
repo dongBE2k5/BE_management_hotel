@@ -47,7 +47,7 @@ public class HostHotelService {
         hostHotel.setCccdMatTruoc(dto.getCccdMatTruoc());
         hostHotel.setCccdMatSau(dto.getCccdMatSau());
         hostHotel.setGiayPhepKinhDoanh(dto.getGiayPhepKinhDoanh());
-        hostHotel.setStatus(HostHotelStatus.VERIFIED);
+        hostHotel.setStatus(HostHotelStatus.PENDING);
         HostHotel saved = hostHotelRepository.save(hostHotel);
         return mapToResponse(saved);
     }
