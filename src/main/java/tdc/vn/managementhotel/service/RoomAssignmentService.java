@@ -24,7 +24,7 @@ public class RoomAssignmentService {
     private final RoomRepository roomRepository;
     private final EmployeeRepository employeeRepository;
     private final UserRepository userRepository;
-    private final RequestRepository requestRepository;
+    private final RequestStaffRepository requestRepository;
 
     public RoomAssignmentResponseDTO mapEntityToResponse(RoomAssignment entity) {
         RoomAssignmentResponseDTO dto = new RoomAssignmentResponseDTO();
@@ -40,12 +40,14 @@ public class RoomAssignmentService {
         dto.setNote(entity.getNote());
         dto.setAssignedAt(entity.getAssignedAt());
         dto.setCompletedAt(entity.getCompletedAt());
+        dto.setRequestId(entity.getRequestStaff().getId());
         return dto;
     }
 
     // --- Tạo mới một RoomAssignment ---
-//    @Transactional
+    @Transactional
     public RoomAssignmentResponseDTO assignRoom(RoomAssignmentRequestDTO requestDTO) {
+
         Room room = roomRepository.findById(requestDTO.getRoomId())
                 .orElseThrow(() -> new RuntimeException("Room not found"));
         Employee employee = employeeRepository.findByUserId(requestDTO.getAssignedById())
@@ -54,8 +56,9 @@ public class RoomAssignmentService {
         Employee employeeCreatedBy = employeeRepository.findByUserId(requestDTO.getEmployeeId())
                 .orElseThrow(() -> new RuntimeException("Employee not found"));
 
-        Request request = requestRepository.findAllById(requestDTO.getRequestId())
-                .orElseThrow(() -> new RuntimeException("Employee not found"));
+        RequestStaff requestStaff = requestRepository.findById(requestDTO.getRequestId())
+                .orElseThrow(() -> new RuntimeException("Request not found"));
+
         room.setStatus(StatusRoom.REQUEST);
         roomRepository.save(room);
         // Tạo entity mới
@@ -66,8 +69,9 @@ public class RoomAssignmentService {
         assignment.setNote(requestDTO.getNote());
         assignment.setStatus(AssignmentStatus.PENDING);
         assignment.setAssignedAt(LocalDateTime.now());
-        assignment.setRequest(request);
+        assignment.setRequestStaff(requestStaff);
         RoomAssignment saved = roomAssignmentRepository.save(assignment);
+    ;
         return mapEntityToResponse(saved);
     }
 

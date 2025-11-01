@@ -32,6 +32,7 @@ public class Employee {
     private User user;
 
     @OneToMany(mappedBy = "employee",cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<RoomAssignment> roomAssignments;
 
 

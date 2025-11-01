@@ -1,6 +1,7 @@
 package tdc.vn.managementhotel.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,8 +14,9 @@ import java.util.List;
 @Entity
 @Data
 @NoArgsConstructor
+@Table(name = "request_staff")
 @AllArgsConstructor
-public class Request {
+public class RequestStaff {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -30,7 +32,7 @@ public class Request {
     private LocalDateTime createdAt = LocalDateTime.now();
     private LocalDateTime updatedAt = LocalDateTime.now();
 
-    @OneToMany(mappedBy = "request",cascade = CascadeType.ALL,orphanRemoval = true)
+    @OneToMany(mappedBy = "requestStaff",cascade = CascadeType.ALL,orphanRemoval = true)
     @JsonIgnore
     private List<RoomAssignment> roomAssignments;
 }

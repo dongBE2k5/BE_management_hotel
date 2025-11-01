@@ -33,7 +33,7 @@ public class FileUploadService {
         Files.copy(file.getInputStream(), filePath);
 
         // Trả về đường dẫn tương đối
-        return "/uploads/" + fileName;
+        return fileName;
     }
 
     public byte[] getImage(String fileName) throws IOException {

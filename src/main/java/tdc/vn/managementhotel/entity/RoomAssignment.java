@@ -1,5 +1,8 @@
 package tdc.vn.managementhotel.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,22 +26,26 @@ public class RoomAssignment {
 
     // resquest
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "request_id", nullable = false)
-    private Request request;
+    @JoinColumn(name = "request_staff_id", nullable = false)
+    @JsonIgnore
+    private RequestStaff requestStaff;
 
     // Phòng được giao dọn
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_id", nullable = false)
+    @JsonIgnore
     private Room room;
 
     // Nhân viên được giao
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "employee_id", nullable = false)
+    @JsonIgnore
     private Employee employee;
 
     // Người lễ tân tạo yêu cầu (optional)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by")
+    @JsonIgnore
     private Employee createdBy;
 
     // Trạng thái nhiệm vụ: PENDING, IN_PROGRESS, DONE, CANCELLED
@@ -56,5 +63,6 @@ public class RoomAssignment {
     private LocalDateTime completedAt;
 
     // Ghi chú (nếu có)
+    @Nullable
     private String note;
 }

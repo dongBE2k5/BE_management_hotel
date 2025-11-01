@@ -1,6 +1,5 @@
 package tdc.vn.managementhotel.controllerAPI;
 
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -8,13 +7,15 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import tdc.vn.managementhotel.dto.ApiResponse;
+import tdc.vn.managementhotel.dto.RequestStaffDTO.RequestStaffRequestDTO;
+import tdc.vn.managementhotel.dto.RequestStaffDTO.RequestStaffResponseDTO;
 import tdc.vn.managementhotel.dto.RoomAssignmentDTO.RoomAssignmentRequestDTO;
-import tdc.vn.managementhotel.entity.Request;
+import tdc.vn.managementhotel.entity.RequestStaff;
 import tdc.vn.managementhotel.enums.AssignmentStatus;
 import tdc.vn.managementhotel.enums.RequestStatus;
-import tdc.vn.managementhotel.repository.DamagedItemRepository;
-import tdc.vn.managementhotel.repository.RequestRepository;
+import tdc.vn.managementhotel.repository.RequestStaffRepository;
 import tdc.vn.managementhotel.service.DamagedItemService;
+import tdc.vn.managementhotel.service.RequestStaffService;
 import tdc.vn.managementhotel.service.RoomAssignmentService;
 
 import java.time.LocalDateTime;
@@ -27,25 +28,25 @@ import java.util.List;
 public class RequestControllerAPI {
 
     private final SimpMessagingTemplate messagingTemplate;
+    private final RequestStaffRepository repo;
 
-    private final RequestRepository repo;
     private final DamagedItemService  damagedItemService;
     private final RoomAssignmentService roomAssignmentService;
+    private final RequestStaffService requestStaffService;
 
 
 
     // User A gửi request cho B
     @PostMapping
     @Transactional
-    public ResponseEntity<Request> create(@RequestBody Request req ,@RequestParam Long roomId) {
+    public ResponseEntity<ApiResponse<RequestStaffResponseDTO>> create(@RequestBody RequestStaffRequestDTO req , @RequestParam Long roomId) {
         req.setStatus(RequestStatus.SENT);
-        Request saved = repo.save(req);
-        RoomAssignmentRequestDTO requestDTO = new RoomAssignmentRequestDTO(roomId,req.getSenderId(),req.getReceiverId(),saved.getId(),req.getContent());
-        roomAssignmentService.assignRoom(requestDTO);
+        RequestStaffResponseDTO saved = requestStaffService.createByRoomAssignment(req,roomId);
+
         // Gửi realtime tới B
-        System.out.println("Request create"+saved.toString());
+//        System.out.println("Request create"+saved.getId().toString());
         messagingTemplate.convertAndSend("/topic/user." + req.getReceiverId(), saved);
-        return ResponseEntity.ok(saved);
+        return ResponseEntity.ok(ApiResponse.success("Gửi yêu cầu thành công",saved));
     }
 
     // User B phản hồi (Accept / Reject)
@@ -54,12 +55,12 @@ public class RequestControllerAPI {
      */
     @PutMapping("/{id}/status")
     @Transactional
-    public ResponseEntity<Request> updateStatus(
+    public ResponseEntity<RequestStaff> updateStatus(
             @PathVariable Long id,
             @RequestParam String status,
             @RequestParam(required = false) Long assignmentId // để xác định nhiệm vụ liên quan
     ) {
-        Request req = repo.findById(id).orElseThrow();
+        RequestStaff req = repo.findById(id).orElseThrow();
         RequestStatus newStatus = RequestStatus.valueOf(status.toUpperCase());
         req.setStatus(newStatus);
         req.setUpdatedAt(LocalDateTime.now());
@@ -100,15 +101,15 @@ public class RequestControllerAPI {
 
     // Lấy danh sách request cho 1 user
     @GetMapping("/received/{receiverId}")
-    public ResponseEntity<ApiResponse<List<Request>>> getReceived(@PathVariable Long receiverId) {
+    public ResponseEntity<ApiResponse<List<RequestStaff>>> getReceived(@PathVariable Long receiverId) {
 
-       List<Request> result = repo.findByReceiverId(receiverId);
+       List<RequestStaff> result = repo.findByReceiverId(receiverId);
         return ResponseEntity.ok(ApiResponse.success("lấy dữ liệu thành recevier",result));
 
     }
 
     @GetMapping("/sent/{senderId}")
-    public List<Request> getSent(@PathVariable Long senderId) {
+    public List<RequestStaff> getSent(@PathVariable Long senderId) {
         return repo.findBySenderId(senderId);
     }
 
