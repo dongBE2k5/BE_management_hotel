@@ -10,5 +10,5 @@ public enum StatusRoom {
     MAINTENANCE,
     REQUEST,
     CLEANING,
-    NEEDCLEANING
+        NEEDCLEANING
 }

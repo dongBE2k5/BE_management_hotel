@@ -14,6 +14,7 @@ public class RoomAssignmentRequestDTO {
     private Long roomId;        // ID của phòng được phân công
     private Long employeeId;    // Nhân viên được giao
     private Long assignedById;  // Người giao nhiệm vụ (quản lý hoặc lễ tân)
+    private Long requestId;
     private String note;        // Ghi chú thêm (nếu có)
 }
 

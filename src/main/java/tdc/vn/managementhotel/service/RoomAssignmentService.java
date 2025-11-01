@@ -6,15 +6,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tdc.vn.managementhotel.dto.RoomAssignmentDTO.RoomAssignmentRequestDTO;
 import tdc.vn.managementhotel.dto.RoomAssignmentDTO.RoomAssignmentResponseDTO;
-import tdc.vn.managementhotel.entity.Employee;
-import tdc.vn.managementhotel.entity.Room;
-import tdc.vn.managementhotel.entity.RoomAssignment;
-import tdc.vn.managementhotel.entity.User;
+import tdc.vn.managementhotel.entity.*;
 import tdc.vn.managementhotel.enums.AssignmentStatus;
-import tdc.vn.managementhotel.repository.EmployeeRepository;
-import tdc.vn.managementhotel.repository.RoomAssignmentRepository;
-import tdc.vn.managementhotel.repository.RoomRepository;
-import tdc.vn.managementhotel.repository.UserRepository;
+import tdc.vn.managementhotel.enums.StatusRoom;
+import tdc.vn.managementhotel.repository.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -29,6 +24,7 @@ public class RoomAssignmentService {
     private final RoomRepository roomRepository;
     private final EmployeeRepository employeeRepository;
     private final UserRepository userRepository;
+    private final RequestRepository requestRepository;
 
     public RoomAssignmentResponseDTO mapEntityToResponse(RoomAssignment entity) {
         RoomAssignmentResponseDTO dto = new RoomAssignmentResponseDTO();
@@ -48,17 +44,20 @@ public class RoomAssignmentService {
     }
 
     // --- Tạo mới một RoomAssignment ---
-    @Transactional
+//    @Transactional
     public RoomAssignmentResponseDTO assignRoom(RoomAssignmentRequestDTO requestDTO) {
         Room room = roomRepository.findById(requestDTO.getRoomId())
                 .orElseThrow(() -> new RuntimeException("Room not found"));
-        Employee employee = employeeRepository.findById(requestDTO.getEmployeeId())
+        Employee employee = employeeRepository.findByUserId(requestDTO.getAssignedById())
+                .orElseThrow(() -> new RuntimeException("Cleaning not found"));
+
+        Employee employeeCreatedBy = employeeRepository.findByUserId(requestDTO.getEmployeeId())
                 .orElseThrow(() -> new RuntimeException("Employee not found"));
 
-        Employee employeeCreatedBy = employeeRepository.findById(requestDTO.getAssignedById())
+        Request request = requestRepository.findAllById(requestDTO.getRequestId())
                 .orElseThrow(() -> new RuntimeException("Employee not found"));
-
-
+        room.setStatus(StatusRoom.REQUEST);
+        roomRepository.save(room);
         // Tạo entity mới
         RoomAssignment assignment = new RoomAssignment();
         assignment.setRoom(room);
@@ -67,7 +66,7 @@ public class RoomAssignmentService {
         assignment.setNote(requestDTO.getNote());
         assignment.setStatus(AssignmentStatus.PENDING);
         assignment.setAssignedAt(LocalDateTime.now());
-
+        assignment.setRequest(request);
         RoomAssignment saved = roomAssignmentRepository.save(assignment);
         return mapEntityToResponse(saved);
     }
@@ -98,7 +97,8 @@ public class RoomAssignmentService {
 
     // --- Lấy danh sách phân công theo nhân viên ---
     public List<RoomAssignmentResponseDTO> getAssignmentsByEmployee(Long employeeId) {
-        return roomAssignmentRepository.findByEmployeeId(employeeId)
+        Employee employee = employeeRepository.findEmployeeByUserId(employeeId);
+        return roomAssignmentRepository.findByEmployeeId(employee.getId())
                 .stream()
                 .map(this::mapEntityToResponse)
                 .collect(Collectors.toList());

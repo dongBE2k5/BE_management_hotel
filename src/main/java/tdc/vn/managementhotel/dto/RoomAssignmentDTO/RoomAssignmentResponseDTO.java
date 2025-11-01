@@ -3,6 +3,7 @@ package tdc.vn.managementhotel.dto.RoomAssignmentDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import tdc.vn.managementhotel.entity.Request;
 import tdc.vn.managementhotel.enums.AssignmentStatus;
 
 import java.time.LocalDateTime;
@@ -27,6 +28,8 @@ public class RoomAssignmentResponseDTO {
 
     private AssignmentStatus status;
     private String note;
+
+    private Request request;
 
     private LocalDateTime assignedAt;
     private LocalDateTime completedAt;

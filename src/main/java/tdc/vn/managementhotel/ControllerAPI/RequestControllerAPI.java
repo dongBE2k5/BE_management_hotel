@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import tdc.vn.managementhotel.dto.ApiResponse;
 import tdc.vn.managementhotel.dto.RoomAssignmentDTO.RoomAssignmentRequestDTO;
 import tdc.vn.managementhotel.entity.Request;
 import tdc.vn.managementhotel.enums.AssignmentStatus;
@@ -37,10 +38,12 @@ public class RequestControllerAPI {
     @PostMapping
     @Transactional
     public ResponseEntity<Request> create(@RequestBody Request req ,@RequestParam Long roomId) {
+        req.setStatus(RequestStatus.SENT);
         Request saved = repo.save(req);
-        RoomAssignmentRequestDTO requestDTO = new RoomAssignmentRequestDTO(roomId,req.getSenderId(),req.getReceiverId(),req.getContent());
+        RoomAssignmentRequestDTO requestDTO = new RoomAssignmentRequestDTO(roomId,req.getSenderId(),req.getReceiverId(),saved.getId(),req.getContent());
         roomAssignmentService.assignRoom(requestDTO);
         // Gửi realtime tới B
+        System.out.println("Request create"+saved.toString());
         messagingTemplate.convertAndSend("/topic/user." + req.getReceiverId(), saved);
         return ResponseEntity.ok(saved);
     }
@@ -97,8 +100,11 @@ public class RequestControllerAPI {
 
     // Lấy danh sách request cho 1 user
     @GetMapping("/received/{receiverId}")
-    public List<Request> getReceived(@PathVariable Long receiverId) {
-        return repo.findByReceiverId(receiverId);
+    public ResponseEntity<ApiResponse<List<Request>>> getReceived(@PathVariable Long receiverId) {
+
+       List<Request> result = repo.findByReceiverId(receiverId);
+        return ResponseEntity.ok(ApiResponse.success("lấy dữ liệu thành recevier",result));
+
     }
 
     @GetMapping("/sent/{senderId}")
