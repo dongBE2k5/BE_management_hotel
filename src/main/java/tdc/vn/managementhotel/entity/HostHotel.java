@@ -27,6 +27,9 @@ public class HostHotel {
     private String cccdMatTruoc;
     private String cccdMatSau;
     private String giayPhepKinhDoanh;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private HostHotelStatus status;
 
 }
