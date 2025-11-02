@@ -73,7 +73,7 @@ public class EmployeeService {
     private EmployeeResponseDTO mapEntityToResponse(Employee employee) {
             User user = employee.getUser();
         return new EmployeeResponseDTO(
-                new UserResponse(user.getId(),user.getFullName(),user.getUsername(),user.getEmail(),user.getPhone(),user.getCccd(),user.getRole()),
+                new UserResponse(user.getId(),user.getFullName(),user.getUsername(),user.getEmail(),user.getPhone(),user.getCccd(),user.getRole(),user.getGender(),user.getBirthDate(),user.getAddress()),
                 employee.getHotel().getId(),
                 employee.getPosition().toString()
         );
