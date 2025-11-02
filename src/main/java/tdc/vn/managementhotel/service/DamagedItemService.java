@@ -7,10 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import tdc.vn.managementhotel.dto.DamageItemDTO.DamagedItemRequestDTO;
 import tdc.vn.managementhotel.dto.DamageItemDTO.DamagedItemResponseDTO;
-import tdc.vn.managementhotel.entity.DamagedItem;
-import tdc.vn.managementhotel.entity.Item;
-import tdc.vn.managementhotel.entity.Room;
-import tdc.vn.managementhotel.entity.User;
+import tdc.vn.managementhotel.entity.*;
 import tdc.vn.managementhotel.enums.DamageStatus;
 import tdc.vn.managementhotel.repository.*;
 
@@ -25,9 +22,11 @@ public class DamagedItemService {
     private final ItemRepository itemRepository;
     private final TypeOfRoomItemRepository typeOfRoomItemRepository;
     private final UserRepository userRepository;
+    private final RequestStaffRepository requestStaffRepository;
 
     @Transactional
     public DamagedItemResponseDTO reportDamage(DamagedItemRequestDTO dto) {
+        System.out.println("dto"+ dto.toString());
         Room room = roomRepository.findById(dto.getRoomId())
                 .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy phòng ID: " + dto.getRoomId()));
 
@@ -37,6 +36,8 @@ public class DamagedItemService {
         User user = userRepository.findById(dto.getReportedBy())
                 .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy user: " + dto.getReportedBy()));
 
+        RequestStaff requestStaff = requestStaffRepository.findById(dto.getRequestStaffId())
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy requestStaff: " + dto.getRequestStaffId()));
         DamagedItem entity = new DamagedItem();
         entity.setRoom(room);
         entity.setItem(item);
@@ -44,7 +45,7 @@ public class DamagedItemService {
         entity.setStatus(dto.getStatus());
         entity.setImage(dto.getImage());
         entity.setUser(user);
-
+        entity.setRequestStaff(requestStaff);
         DamagedItem saved = damagedItemRepository.save(entity);
         return mapToResponse(saved);
     }
@@ -62,7 +63,8 @@ public class DamagedItemService {
 
         User user = userRepository.findById(dtoList.get(0).getReportedBy())
                 .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy user: " + dtoList.get(0).getReportedBy()));
-
+        RequestStaff requestStaff = requestStaffRepository.findById(dtoList.get(0).getRequestStaffId())
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy requestStaff: " + dtoList.get(0).getRequestStaffId()));
         // Đảm bảo tất cả cùng 1 phòng
         boolean allSameRoom = dtoList.stream().allMatch(d -> d.getRoomId().equals(roomId));
         if (!allSameRoom) {
@@ -80,7 +82,7 @@ public class DamagedItemService {
             entity.setStatus(dto.getStatus());
             entity.setImage(dto.getImage());
             entity.setUser(user);
-
+            entity.setRequestStaff(requestStaff);
             return damagedItemRepository.save(entity);
         }).collect(Collectors.toList());
 
@@ -111,6 +113,7 @@ public class DamagedItemService {
 
     private DamagedItemResponseDTO mapToResponse(DamagedItem entity) {
         return DamagedItemResponseDTO.builder()
+                .requestStaffId(entity.getRequestStaff().getId())
                 .id(entity.getId())
                 .roomId(entity.getRoom().getId())
                 .roomNumber(entity.getRoom().getRoomNumber())
@@ -121,6 +124,7 @@ public class DamagedItemService {
                 .image(entity.getImage())
                 .reportedBy(entity.getUser().getUsername())
                 .reportedAt(entity.getReportedAt())
+
                 .build();
     }
 }

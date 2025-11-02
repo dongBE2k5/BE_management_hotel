@@ -128,7 +128,8 @@ public class BookingService {
                 room.getStatus(),
                 room.getTypeOfRoom().getRoom(),
                 room.getPrice(),
-                new HotelSummaryDTO(room.getHotel().getId(), room.getHotel().getName())
+                new HotelSummaryDTO(room.getHotel().getId(), room.getHotel().getName()),
+                room.getTypeOfRoom().getId()
         );
     }
 

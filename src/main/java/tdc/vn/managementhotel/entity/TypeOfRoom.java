@@ -35,6 +35,13 @@ public class TypeOfRoom {
     )
     private Set<TypeOfRoomItem> typeOfRoomItems = new HashSet<>();
 
+    @OneToMany(
+            mappedBy = "typeOfRoom",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    private Set<Room> rooms = new HashSet<>();
+
 
 
 

@@ -19,4 +19,5 @@ public class RoomResponseDTO {
     private TypeRoom typeRoom;
     private BigDecimal price;
     private HotelSummaryDTO hotel; // ✅ thay vì String hotelName
+    private Long typeOfRoomId;
 }

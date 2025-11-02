@@ -20,4 +20,5 @@ public class DamagedItemRequestDTO {
     private DamageStatus status;
     private String image;
     private Long reportedBy;
+    private Long requestStaffId;
 }

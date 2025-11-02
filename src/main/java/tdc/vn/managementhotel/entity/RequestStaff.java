@@ -35,4 +35,10 @@ public class RequestStaff {
     @OneToMany(mappedBy = "requestStaff",cascade = CascadeType.ALL,orphanRemoval = true)
     @JsonIgnore
     private List<RoomAssignment> roomAssignments;
+
+    @OneToMany(mappedBy = "requestStaff",cascade = CascadeType.ALL,orphanRemoval = true)
+    @JsonIgnore
+    private List<DamagedItem> damagedItems;
+
+
 }

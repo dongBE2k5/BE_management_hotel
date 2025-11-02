@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 public class DamagedItemResponseDTO {
+    private Long requestStaffId;
     private Long id;
     private Long roomId;
     private String roomNumber;

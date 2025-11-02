@@ -70,7 +70,8 @@ public class HistoryChangeBookingStatusService {
                 room.getStatus(),
                 room.getTypeOfRoom().getRoom(),
                 room.getPrice(),
-                new HotelSummaryDTO(room.getHotel().getId(), room.getHotel().getName()) // ✅ truyền object hotel
+                new HotelSummaryDTO(room.getHotel().getId(), room.getHotel().getName()), // ✅ truyền object hotel
+                room.getTypeOfRoom().getId()
         );
 
     }

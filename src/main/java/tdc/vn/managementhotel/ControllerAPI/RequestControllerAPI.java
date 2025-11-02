@@ -58,7 +58,8 @@ public class RequestControllerAPI {
     public ResponseEntity<RequestStaff> updateStatus(
             @PathVariable Long id,
             @RequestParam String status,
-            @RequestParam(required = false) Long assignmentId // để xác định nhiệm vụ liên quan
+            @RequestParam(required = false) Long assignmentId, // để xác định nhiệm vụ liên quan
+            @RequestParam Long roomId
     ) {
         RequestStaff req = repo.findById(id).orElseThrow();
         RequestStatus newStatus = RequestStatus.valueOf(status.toUpperCase());

@@ -41,6 +41,7 @@ public class RoomAssignmentService {
         dto.setAssignedAt(entity.getAssignedAt());
         dto.setCompletedAt(entity.getCompletedAt());
         dto.setRequestId(entity.getRequestStaff().getId());
+        dto.setAcceptedAt(entity.getAcceptedAt());
         return dto;
     }
 

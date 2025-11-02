@@ -31,5 +31,6 @@ public class RoomAssignmentResponseDTO {
     private Long requestId;
 
     private LocalDateTime assignedAt;
+    private LocalDateTime acceptedAt;
     private LocalDateTime completedAt;
 }
