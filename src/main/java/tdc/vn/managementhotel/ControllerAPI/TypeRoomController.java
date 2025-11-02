@@ -15,10 +15,10 @@ import tdc.vn.managementhotel.service.TypeOfRoomService;
 import java.io.IOException;
 import java.util.List;
 
-@CrossOrigin
 @RestController
 @RequestMapping("/api/type-rooms")
 @RequiredArgsConstructor
+@CrossOrigin(originPatterns = "*", allowedHeaders = "*")
 public class TypeRoomController {
     private final ImageRoomService imageRoomService;
     private final TypeOfRoomService typeOfRoomService;

@@ -78,11 +78,14 @@ public class RoomAssignmentService {
 
     // --- Cập nhật trạng thái ---
     @Transactional
-    public RoomAssignmentResponseDTO updateStatus(Long id, AssignmentStatus newStatus) {
+    public RoomAssignmentResponseDTO updateStatus(Long id, AssignmentStatus newStatus,Long roomId) {
         RoomAssignment assignment = roomAssignmentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Assignment not found"));
         assignment.setStatus(newStatus);
         if (newStatus == AssignmentStatus.COMPLETED) {
+            Room room = roomRepository.findById(roomId)
+                    .orElseThrow(() -> new RuntimeException("Room not found"));
+            room.setStatus(StatusRoom.AVAILABLE);
             assignment.setCompletedAt(LocalDateTime.now());
         }
         if (newStatus == AssignmentStatus.IN_PROGRESS) {

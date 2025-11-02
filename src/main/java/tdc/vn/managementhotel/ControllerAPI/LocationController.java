@@ -10,8 +10,9 @@ import tdc.vn.managementhotel.service.LocationService;
 
 import java.util.List;
 
-@CrossOrigin
+
 @RestController
+@CrossOrigin(originPatterns = "*", allowedHeaders = "*")
 @RequestMapping("/api/locations")
 public class LocationController {
     @Autowired

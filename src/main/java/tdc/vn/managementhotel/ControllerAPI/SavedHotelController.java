@@ -12,7 +12,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/saved-hotels")
 @RequiredArgsConstructor
-@CrossOrigin
+@CrossOrigin(originPatterns = "*", allowedHeaders = "*")
 public class SavedHotelController {
 
     private final SavedHotelService savedHotelService;

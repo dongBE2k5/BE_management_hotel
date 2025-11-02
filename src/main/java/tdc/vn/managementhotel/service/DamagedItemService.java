@@ -11,6 +11,7 @@ import tdc.vn.managementhotel.entity.*;
 import tdc.vn.managementhotel.enums.DamageStatus;
 import tdc.vn.managementhotel.repository.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 @Service
@@ -111,7 +112,20 @@ public class DamagedItemService {
                 .collect(Collectors.toList());
     }
 
+    public List<DamagedItemResponseDTO> getByRequest(Long requestStaffId) {
+        RequestStaff requestStaff = requestStaffRepository.findById(requestStaffId)
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy request: " + requestStaffId));
+        return damagedItemRepository.findByRequestStaff(requestStaff)
+                .stream().map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
     private DamagedItemResponseDTO mapToResponse(DamagedItem entity) {
+        BigDecimal price = entity.getItem().getTypeOfRoomItems().stream()
+                .filter(tri -> tri.getTypeOfRoom().getId().equals(entity.getRoom().getTypeOfRoom().getId()))
+                .map(TypeOfRoomItem::getPrice)
+                .findFirst()
+                .orElse(BigDecimal.ZERO);
         return DamagedItemResponseDTO.builder()
                 .requestStaffId(entity.getRequestStaff().getId())
                 .id(entity.getId())
@@ -124,7 +138,7 @@ public class DamagedItemService {
                 .image(entity.getImage())
                 .reportedBy(entity.getUser().getUsername())
                 .reportedAt(entity.getReportedAt())
-
+                .price(price)
                 .build();
     }
 }

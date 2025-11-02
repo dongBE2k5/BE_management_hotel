@@ -13,7 +13,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/vouchers")
-@CrossOrigin(origins = "*") // cho phép react native gọi
+@CrossOrigin(originPatterns = "*", allowedHeaders = "*")// cho phép react native gọi
 public class VoucherController {
 
     @Autowired

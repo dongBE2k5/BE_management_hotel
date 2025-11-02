@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import tdc.vn.managementhotel.enums.DamageStatus;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
@@ -24,4 +25,5 @@ public class DamagedItemResponseDTO {
     private String image;
     private String reportedBy;
     private LocalDateTime reportedAt;
+    private BigDecimal price;
 }

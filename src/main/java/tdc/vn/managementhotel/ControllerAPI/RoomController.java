@@ -11,10 +11,11 @@ import tdc.vn.managementhotel.service.RoomService;
 import java.time.LocalDate;
 import java.util.List;
 
-@CrossOrigin
+
 @RestController
 @RequestMapping("/api/rooms")
 @RequiredArgsConstructor
+@CrossOrigin(originPatterns = "*", allowedHeaders = "*")
 public class RoomController {
 
     private final HotelService hotelService;
