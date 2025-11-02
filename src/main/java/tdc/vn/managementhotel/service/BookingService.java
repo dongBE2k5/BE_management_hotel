@@ -116,7 +116,10 @@ public class BookingService {
                 user.getEmail(),
                 user.getPhone(),
                 user.getCccd(),
-                user.getRole()
+                user.getRole(),
+                user.getGender(),
+                user.getBirthDate(),
+                user.getAddress()
         );
     }
 

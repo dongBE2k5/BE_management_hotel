@@ -15,7 +15,7 @@ public class Voucher {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name; // 👈 Thêm trường này
+    private String name;
 
     private String code;
     private String description;

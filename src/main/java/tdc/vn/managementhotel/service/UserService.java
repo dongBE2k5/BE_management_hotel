@@ -77,7 +77,7 @@ public class UserService {
         }
         // ⚙️ Kiểm tra password hợp lệ
         if (!PASSWORD_PATTERN.matcher(req.getPassword()).matches()) {
-            throw new RuntimeException(" Mật khẩu không hợp lệ! " +
+            throw new RuntimeException(" Mật khẩu chua " +
                     "Phải có ít nhất 6 ký tự, 1 chữ in hoa và 1 ký tự đặc biệt, không có khoảng trắng.");
         }
 
@@ -173,7 +173,10 @@ public class UserService {
                 user.getEmail(),
                 user.getPhone(),
                 user.getCccd(),
-                user.getRole()
+                user.getRole(),
+                user.getGender(),
+                user.getBirthDate(),
+                user.getAddress()
         );
     }
     //ham doi mat khau
