@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import tdc.vn.managementhotel.entity.Utility;
 import tdc.vn.managementhotel.enums.UtilityType;
+import tdc.vn.managementhotel.enums.UtilityUsed;
 
 import java.util.List;
 
@@ -11,6 +12,7 @@ import java.util.List;
 public interface UtilityRepository extends JpaRepository<Utility, Long> {
 //    List<Utility> findBy(Long clientId);
     List<Utility> findByType(UtilityType type);
+    List<Utility> findByHotel_Id(Long id);
 
-//    List<Utility> findByType(UtilityType type);
+    List<Utility> findByHotel_IdAndTypeAndIsUsed(Long hotelId, UtilityType type, UtilityUsed isUsed);
 }

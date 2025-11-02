@@ -12,7 +12,7 @@ import java.nio.file.Paths;
 @Service
 public class FileUploadService {
 
-    private static final String UPLOAD_DIR = "src/main/resources/static/uploads";
+    private static final String UPLOAD_DIR = "src/main/resources/static/uploads/";
 
     public String uploadImage(MultipartFile file) throws IOException {
         if (file.isEmpty()) {
@@ -42,5 +42,16 @@ public class FileUploadService {
             throw new IOException("Không tìm thấy file: " + fileName);
         }
         return Files.readAllBytes(filePath);
+    }
+
+    public void deleteImage(String imageUrl) {
+        try {
+            // Giả sử imageUrl dạng: http://localhost:8080/uploads/abc.jpg
+            Path filePath = Paths.get(UPLOAD_DIR + imageUrl);
+            System.out.println("Path: " + filePath);
+            Files.deleteIfExists(filePath);
+        } catch (IOException e) {
+            System.err.println("Không thể xóa ảnh cũ: " + e.getMessage());
+        }
     }
 }

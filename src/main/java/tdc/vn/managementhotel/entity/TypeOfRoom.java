@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import tdc.vn.managementhotel.enums.TypeRoom;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -34,6 +35,9 @@ public class TypeOfRoom {
             orphanRemoval = true
     )
     private Set<TypeOfRoomItem> typeOfRoomItems = new HashSet<>();
+
+    @OneToMany(mappedBy = "typeOfRoom", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TypeOfRoomUtility> typeOfRoomUtilities = new ArrayList<>();
 
     @OneToMany(
             mappedBy = "typeOfRoom",

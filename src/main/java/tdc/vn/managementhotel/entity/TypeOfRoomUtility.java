@@ -11,17 +11,16 @@ import java.math.BigDecimal;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class BookingUtility extends BaseEntity {
+public class TypeOfRoomUtility extends BaseEntity {
 
     @EmbeddedId
-    private BookingUtilityID id = new BookingUtilityID();
+    private TypeOfRoomUtilityID id = new TypeOfRoomUtilityID();
     @ManyToOne
-    @MapsId("bookingId")
-    @JoinColumn(name = "booking_id")
-    private Booking booking;
+    @MapsId("typeOfRoomId")
+    @JoinColumn(name = "type_of_room_id")
+    private TypeOfRoom typeOfRoom;
     @ManyToOne
     @MapsId("utilityId")
     @JoinColumn(name = "utility_id")
     private Utility utility;
-    private Integer quantity = 1;
 }

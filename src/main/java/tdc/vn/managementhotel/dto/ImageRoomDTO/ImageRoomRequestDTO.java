@@ -7,7 +7,8 @@ import java.util.List;
 
 @Data
 public class ImageRoomRequestDTO {
-    private List<String> image = new ArrayList<>();
     private Long hotelId;
     private Long roomTypeId;
+    private List<Long> deletedImageIds; // thêm mới
+
 }

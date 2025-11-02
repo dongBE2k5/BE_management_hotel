@@ -3,6 +3,7 @@ package tdc.vn.managementhotel.ControllerAPI;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import tdc.vn.managementhotel.dto.ApiResponse;
 import tdc.vn.managementhotel.dto.ImageRoomDTO.ImageRoomRequestDTO;
 import tdc.vn.managementhotel.dto.ImageRoomDTO.ImageRoomResponseDTO;
@@ -11,6 +12,7 @@ import tdc.vn.managementhotel.entity.TypeOfRoom;
 import tdc.vn.managementhotel.service.ImageRoomService;
 import tdc.vn.managementhotel.service.TypeOfRoomService;
 
+import java.io.IOException;
 import java.util.List;
 
 @CrossOrigin
@@ -48,13 +50,15 @@ public class TypeRoomController {
     }
 
     @PostMapping()
-    public ResponseEntity<ApiResponse> createTypeRoomByHotel(@RequestBody ImageRoomRequestDTO dto) {
-        return imageRoomService.create(dto);
+    public ResponseEntity<ApiResponse> createTypeRoomByHotel(@ModelAttribute ImageRoomRequestDTO dto, @RequestParam(value = "images", required = false) MultipartFile[] images) throws IOException {
+        return imageRoomService.create(dto, images);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse> updateTypeRoomByHotel(@PathVariable Long id, @RequestBody ImageRoomRequestDTO dto) {
-        return imageRoomService.update(id, dto);
+    public ResponseEntity<ApiResponse> updateTypeRoomByHotel(@PathVariable Long id, @ModelAttribute ImageRoomRequestDTO dto, @RequestParam(value = "images", required = false) MultipartFile[] images) throws IOException {
+        System.out.println("id : " + id);
+        System.out.println("dto : " + dto);
+        return imageRoomService.update(id, dto, images);
     }
 
     @DeleteMapping("/{typeRoomId}/hotel/{id}")

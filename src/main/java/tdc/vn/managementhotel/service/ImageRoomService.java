@@ -2,11 +2,13 @@ package tdc.vn.managementhotel.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import tdc.vn.managementhotel.dto.ApiResponse;
 import tdc.vn.managementhotel.dto.ImageRoomDTO.ImageRoomRequestDTO;
 import tdc.vn.managementhotel.dto.ImageRoomDTO.ImageRoomResponseDTO;
@@ -21,33 +23,36 @@ import tdc.vn.managementhotel.repository.ImageRoomRepository;
 import tdc.vn.managementhotel.repository.LocationRepository;
 import tdc.vn.managementhotel.repository.TypeOfRoomRepository;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ImageRoomService {
     private final ImageRoomRepository imageRoomRepository;
     private final HotelRepository hotelRepository;
     private final TypeOfRoomRepository typeOfRoomRepository;
+    private final FileUploadService fileUploadService;
 
-    public ResponseEntity<ApiResponse> create(ImageRoomRequestDTO imageRoomRequestDTO) {
+    public ResponseEntity<ApiResponse> create(ImageRoomRequestDTO imageRoomRequestDTO, MultipartFile[] images) throws IOException {
         List<ImageRoom> imageRoomList = new ArrayList<>();
         TypeOfRoom typeOfRoom = typeOfRoomRepository.findById(imageRoomRequestDTO.getRoomTypeId())
                 .orElseThrow(() -> new EntityNotFoundException("Type of room not found"));
         System.out.println("hotelID = " + imageRoomRequestDTO.getHotelId());
         Hotel hotel = hotelRepository.findById(imageRoomRequestDTO.getHotelId())
                 .orElseThrow(() -> new EntityNotFoundException("Hotels not found"));
-        imageRoomRequestDTO.getImage().forEach(image -> {
+        for (MultipartFile image : images) {
             ImageRoom imageRoom = new ImageRoom();
-            imageRoom.setName(image);
+            imageRoom.setName(fileUploadService.uploadImage(image));
             imageRoom.setRoomType(typeOfRoom);
             imageRoom.setHotel(hotel);
             imageRoomList.add(imageRoom);
-        });
+        }
         List<ImageRoomResponseDTO> imageRoomListRes = imageRoomRepository.saveAll(imageRoomList).stream().map(this::mapEntityToResponse)
                 .collect(Collectors.toList());
         ApiResponse<List<ImageRoomResponseDTO>> response = new ApiResponse<>(
@@ -144,24 +149,39 @@ public class ImageRoomService {
 //                .orElseThrow(() -> new EntityNotFoundException("Location not found with id " + id));
 //    }
     @Transactional
-    public ResponseEntity<ApiResponse> update(Long hotelId, ImageRoomRequestDTO imageRoomRequestDTO) {
+    public ResponseEntity<ApiResponse> update(Long hotelId, ImageRoomRequestDTO imageRoomRequestDTO, MultipartFile[] newImages) throws IOException {
         Hotel hotel = hotelRepository.findById(hotelId)
                 .orElseThrow(() -> new RuntimeException("Hotel not found"));
         TypeOfRoom typeOfRoom = typeOfRoomRepository.findById(imageRoomRequestDTO.getRoomTypeId())
                 .orElseThrow(() -> new EntityNotFoundException("Type of room not found"));
 
-        imageRoomRepository.deleteByHotelIdAndRoomType_Id(hotelId, imageRoomRequestDTO.getRoomTypeId());
-        List<ImageRoom> imageRoomList = imageRoomRequestDTO.getImage().stream()
-                .map(image -> {
-                    ImageRoom imageRoom = new ImageRoom();
-                    imageRoom.setName(image);
-                    imageRoom.setRoomType(typeOfRoom);
-                    imageRoom.setHotel(hotel);
-                    return imageRoom;
-                })
-                .collect(Collectors.toList());
+        if (imageRoomRequestDTO.getDeletedImageIds() != null && !imageRoomRequestDTO.getDeletedImageIds().isEmpty()) {
+            for (Long imageId : imageRoomRequestDTO.getDeletedImageIds()) {
+                ImageRoom img = imageRoomRepository.findById(imageId)
+                        .orElse(null);
+                if (img != null) {
+                    fileUploadService.deleteImage(img.getName());
+                    imageRoomRepository.delete(img);
+                }
+            }
+        }
 
-        List<ImageRoomResponseDTO> imageRoomListRes = imageRoomRepository.saveAll(imageRoomList)
+        // 3️⃣ Thêm ảnh mới nếu có
+        List<ImageRoom> newImageRooms = new ArrayList<>();
+        if (newImages != null && newImages.length > 0) {
+            for (MultipartFile image : newImages) {
+                ImageRoom imageRoom = new ImageRoom();
+                imageRoom.setName(fileUploadService.uploadImage(image));
+                imageRoom.setRoomType(typeOfRoom);
+                imageRoom.setHotel(hotel);
+                newImageRooms.add(imageRoom);
+            }
+            imageRoomRepository.saveAll(newImageRooms);
+        }
+
+        // 4️⃣ Lấy lại danh sách ảnh sau khi cập nhật
+        List<ImageRoomResponseDTO> updatedList = imageRoomRepository
+                .findByHotelIdAndRoomTypeId(hotelId, imageRoomRequestDTO.getRoomTypeId())
                 .stream()
                 .map(this::mapEntityToResponse)
                 .collect(Collectors.toList());
@@ -169,7 +189,7 @@ public class ImageRoomService {
         ApiResponse<List<ImageRoomResponseDTO>> response = new ApiResponse<>(
                 HttpStatus.OK.value(),
                 "Cập nhật thành công",
-                imageRoomListRes,
+                updatedList,
                 LocalDateTime.now()
         );
 

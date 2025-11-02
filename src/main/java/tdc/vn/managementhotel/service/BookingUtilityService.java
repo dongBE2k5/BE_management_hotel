@@ -1,23 +1,16 @@
 package tdc.vn.managementhotel.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import tdc.vn.managementhotel.config.ResourceNotFoundException;
-import tdc.vn.managementhotel.dto.ApiResponse;
 import tdc.vn.managementhotel.dto.BookingUtilityDTO.BookingUtilityDTO;
-import tdc.vn.managementhotel.dto.HotelUtilityDTO.HotelUtilityRequestDTO;
 import tdc.vn.managementhotel.entity.*;
 import tdc.vn.managementhotel.repository.BookingRepository;
 import tdc.vn.managementhotel.repository.BookingUtilityRepository;
-import tdc.vn.managementhotel.repository.HotelUtilityRepository;
 import tdc.vn.managementhotel.repository.UtilityRepository;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
