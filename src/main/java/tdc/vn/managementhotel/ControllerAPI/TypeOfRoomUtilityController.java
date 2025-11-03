@@ -11,7 +11,7 @@ import tdc.vn.managementhotel.service.TypeOfRoomUtilityService;
 @RestController
 @RequestMapping("/api/type-of-room-utility")
 @RequiredArgsConstructor
-@CrossOrigin
+@CrossOrigin(originPatterns = "*", allowedHeaders = "*")
 public class TypeOfRoomUtilityController {
     private final TypeOfRoomUtilityService typeOfRoomUtilityService;
 

@@ -15,6 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/type-of-room-items")
 @RequiredArgsConstructor
+@CrossOrigin(originPatterns = "*", allowedHeaders = "*")
 public class TypeOfRoomItemControllerAPI {
 
     private final TypeOfRoomItemService typeOfRoomItemService;

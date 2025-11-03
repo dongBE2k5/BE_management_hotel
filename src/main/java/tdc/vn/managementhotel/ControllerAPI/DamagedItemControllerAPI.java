@@ -15,6 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/damaged-items")
 @RequiredArgsConstructor
+@CrossOrigin(originPatterns = "*", allowedHeaders = "*")
 public class DamagedItemControllerAPI {
 
     private final DamagedItemService damagedItemService;
@@ -71,6 +72,13 @@ public class DamagedItemControllerAPI {
 
         List<DamagedItemResponseDTO> result = damagedItemService.getByRoom(roomId);
         return ResponseEntity.ok(ApiResponse.success("Danh sách vật phẩm hư hỏng trong phòng " + roomId, result));
+    }
+
+    @GetMapping("/request/{requestID}")
+    public ResponseEntity<ApiResponse<List<DamagedItemResponseDTO>>> getByReaquest(@PathVariable Long requestID) {
+
+        List<DamagedItemResponseDTO> result = damagedItemService.getByRequest(requestID);
+        return ResponseEntity.ok(ApiResponse.success("Danh sách vật phẩm hư hỏng trong phòng " + requestID, result));
     }
 }
 

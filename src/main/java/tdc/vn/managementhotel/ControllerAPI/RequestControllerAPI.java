@@ -72,21 +72,21 @@ public class RequestControllerAPI {
             case RECEIVED:
                 // nhân viên đã nhận nhiệm vụ — chuyển sang IN_PROGRESS
                 if (assignmentId != null) {
-                    roomAssignmentService.updateStatus(assignmentId, AssignmentStatus.IN_PROGRESS);
+                    roomAssignmentService.updateStatus(assignmentId, AssignmentStatus.IN_PROGRESS,roomId);
                 }
                 break;
 
             case HAS_ISSUE:
                 // có vấn đề — cập nhật assignment sang COMPLETED (sẽ xử lý damaged item bằng API khác)
                 if (assignmentId != null) {
-                    roomAssignmentService.updateStatus(assignmentId, AssignmentStatus.COMPLETED);
+                    roomAssignmentService.updateStatus(assignmentId, AssignmentStatus.COMPLETED,roomId);
                 }
                 break;
 
             case NO_ISSUE:
                 // hoàn thành bình thường
                 if (assignmentId != null) {
-                    roomAssignmentService.updateStatus(assignmentId, AssignmentStatus.COMPLETED);
+                    roomAssignmentService.updateStatus(assignmentId, AssignmentStatus.COMPLETED,roomId);
                 }
                 break;
 

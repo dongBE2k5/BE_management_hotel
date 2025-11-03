@@ -12,7 +12,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/rates")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
+@CrossOrigin(originPatterns = "*", allowedHeaders = "*")
 public class RateController {
 
     private final RateService rateService;

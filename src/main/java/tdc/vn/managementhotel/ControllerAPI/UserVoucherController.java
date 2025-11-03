@@ -12,7 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/user-vouchers")
-@CrossOrigin(origins = "*")
+@CrossOrigin(originPatterns = "*", allowedHeaders = "*")
 public class UserVoucherController {
 
     @Autowired

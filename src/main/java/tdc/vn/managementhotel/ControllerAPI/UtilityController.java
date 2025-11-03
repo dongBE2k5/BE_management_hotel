@@ -16,10 +16,11 @@ import tdc.vn.managementhotel.service.UtilityService;
 
 import java.io.IOException;
 
-@CrossOrigin
+
 @RestController
 @RequestMapping("api/utility")
 @RequiredArgsConstructor
+@CrossOrigin(originPatterns = "*", allowedHeaders = "*")
 public class UtilityController {
     private final UtilityService utilityService;
     private final FileUploadService fileUploadService;

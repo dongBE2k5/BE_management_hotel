@@ -8,7 +8,7 @@ import tdc.vn.managementhotel.service.BookingUtilityService;
 @RestController
 @RequestMapping("/api/booking-utility")
 @RequiredArgsConstructor
-@CrossOrigin
+@CrossOrigin(originPatterns = "*", allowedHeaders = "*")
 public class BookingUtilityController {
     private final BookingUtilityService bookingUtilityService;
 

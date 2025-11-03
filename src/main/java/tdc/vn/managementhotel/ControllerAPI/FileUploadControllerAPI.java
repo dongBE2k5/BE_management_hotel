@@ -15,6 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/upload")
 @RequiredArgsConstructor
+@CrossOrigin(originPatterns = "*", allowedHeaders = "*")
 public class FileUploadControllerAPI {
     private final FileUploadService fileUploadService;
 

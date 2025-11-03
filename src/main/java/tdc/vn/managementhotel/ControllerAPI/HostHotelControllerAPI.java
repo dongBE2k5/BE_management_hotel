@@ -15,11 +15,12 @@ import tdc.vn.managementhotel.service.FileUploadService;
 import tdc.vn.managementhotel.service.HostHotelService;
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequestMapping("api/host")
 @RequiredArgsConstructor
-@CrossOrigin("*")
+@CrossOrigin(originPatterns = "*", allowedHeaders = "*")
 public class HostHotelControllerAPI {
     private final HostHotelService hostHotelService;
     private final FileUploadService fileUploadService;
@@ -73,6 +74,11 @@ public class HostHotelControllerAPI {
     @GetMapping("/{idUser}/user")
     public ResponseEntity<ApiResponse<HostHotelResponseDTO>> getHostHotelByUserId(@PathVariable Long idUser) {
         HostHotelResponseDTO dto = hostHotelService.getByUserId(idUser);
+        return ResponseEntity.ok(ApiResponse.success("Lấy thành công hostHotel", dto));
+    }
+    @GetMapping("/allhost")
+    public ResponseEntity<ApiResponse<List<HostHotelResponseDTO>>> getHostHotelAll() {
+        List<HostHotelResponseDTO> dto = hostHotelService.getAll();
         return ResponseEntity.ok(ApiResponse.success("Lấy thành công hostHotel", dto));
     }
 
