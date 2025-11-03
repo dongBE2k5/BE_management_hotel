@@ -3,13 +3,16 @@ package tdc.vn.managementhotel.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import tdc.vn.managementhotel.dto.HotelDTO.HotelResponseDTO;
+import tdc.vn.managementhotel.dto.LocationDTO.LocationResponseDTO;
 import tdc.vn.managementhotel.entity.Hotel;
 import tdc.vn.managementhotel.entity.ViewedHotel;
 import tdc.vn.managementhotel.repository.ViewedHotelRepository;
 import tdc.vn.managementhotel.repository.HotelRepository;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -46,7 +49,7 @@ public class ViewedHotelService {
     public List<HotelResponseDTO> getRecentlyViewedHotels(Long userId) {
         return viewedHotelRepository.findTop10ByUserIdOrderByViewedAtDesc(userId)
                 .stream()
-                .map(v -> new HotelResponseDTO(v.getHotel())) // 👈 lấy từ entity Hotel
+                .map(this::mapEntityToResponse) // 👈 lấy từ entity Hotel
                 .collect(Collectors.toList());
     }
 
@@ -56,8 +59,39 @@ public class ViewedHotelService {
         }
         return viewedHotelRepository.findRecentlyViewedByUserAndLocation(userId, locationId)
                 .stream()
-                .map(HotelResponseDTO::new)
+                .map(this::mapEntityToResponse)
                 .collect(Collectors.toList());
+    }
+
+    private HotelResponseDTO mapEntityToResponse(ViewedHotel viewedHotel) {
+        return new HotelResponseDTO(
+                viewedHotel.getHotel().getId(),
+                viewedHotel.getHotel().getName(),
+                viewedHotel.getHotel().getAddress(),
+                viewedHotel.getHotel().getPhone(),
+                viewedHotel.getHotel().getImage(),
+                viewedHotel.getHotel().getEmail(),
+                viewedHotel.getHotel().getStatus(),
+                new LocationResponseDTO( viewedHotel.getHotel().getLocation().getId(), viewedHotel.getHotel().getLocation().getName()),
+                BigDecimal.valueOf(0),
+                BigDecimal.valueOf(0)
+//                hotel.getUser().getUsername()
+        );
+    }
+    private HotelResponseDTO mapEntityToResponse(Hotel hotel) {
+        return new HotelResponseDTO(
+                hotel.getId(),
+                hotel.getName(),
+                hotel.getAddress(),
+                hotel.getPhone(),
+                hotel.getImage(),
+                hotel.getEmail(),
+                hotel.getStatus(),
+                new LocationResponseDTO(hotel.getLocation().getId(), hotel.getLocation().getName()),
+                BigDecimal.valueOf(0),
+                BigDecimal.valueOf(0)
+//                hotel.getUser().getUsername()
+        );
     }
 
 }

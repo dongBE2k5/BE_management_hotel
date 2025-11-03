@@ -42,7 +42,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     // ✅ Top 5 khách sạn theo location
     @Query("""
-        SELECT b.room.hotel AS hotel, COUNT(b) AS totalBookings
+        SELECT b.room.hotel AS hotel, COUNT(b) AS totalBookings, b.room.hotel.location
         FROM Booking b
         WHERE b.status = tdc.vn.managementhotel.enums.BookingStatus.DA_THANH_TOAN
           AND b.room.hotel.location.id = :locationId

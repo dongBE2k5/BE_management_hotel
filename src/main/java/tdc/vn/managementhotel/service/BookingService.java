@@ -171,7 +171,7 @@ public class BookingService {
             dto.setId(hotel.getId());
             dto.setName(hotel.getName());
             dto.setImage(hotel.getImage());
-            dto.setLocationName(hotel.getLocation().getName());
+            new LocationResponseDTO(hotel.getLocation().getId(), hotel.getLocation().getName());
             dto.setStatus(hotel.getStatus());
             dto.setTotalBookings(totalBookings);
             return dto;
@@ -181,7 +181,7 @@ public class BookingService {
     public List<HotelBookingCountDTO> getBestChoiceHotelsByLocation(Long locationId) {
         Pageable topFive = PageRequest.of(0, 5);
         List<Object[]> results = bookingRepository.findTop5HotelsWithMostBookingsByLocation(locationId, topFive);
-
+        System.out.println("Results: " + results);
         return results.stream().map(row -> {
             Hotel hotel = (Hotel) row[0];
             Long totalBookings = (Long) row[1];
@@ -190,7 +190,7 @@ public class BookingService {
             dto.setId(hotel.getId());
             dto.setName(hotel.getName());
             dto.setImage(hotel.getImage());
-            dto.setLocationName(hotel.getLocation().getName());
+            new LocationResponseDTO(hotel.getLocation().getId(), hotel.getLocation().getName());
             dto.setStatus(hotel.getStatus());
             dto.setTotalBookings(totalBookings);
             return dto;

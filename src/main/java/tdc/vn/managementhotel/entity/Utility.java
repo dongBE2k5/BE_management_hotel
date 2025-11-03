@@ -31,7 +31,7 @@ public class Utility extends BaseEntity {
     private BigDecimal price;
 
     @Enumerated(EnumType.STRING)
-    private UtilityUsed isUsed = UtilityUsed.UNUSED;
+    private UtilityUsed isUsed = UtilityUsed.USED;
     // @OneToMany(mappedBy = "utility", cascade = CascadeType.ALL, orphanRemoval = true)
     // private Set<HotelUtility> hotelUtilities = new HashSet<>();
 
