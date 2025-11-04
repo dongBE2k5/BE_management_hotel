@@ -121,11 +121,10 @@ public class DamagedItemService {
     }
 
     private DamagedItemResponseDTO mapToResponse(DamagedItem entity) {
-        BigDecimal price = entity.getItem().getTypeOfRoomItems().stream()
-                .filter(tri -> tri.getTypeOfRoom().getId().equals(entity.getRoom().getTypeOfRoom().getId()))
-                .map(TypeOfRoomItem::getPrice)
-                .findFirst()
-                .orElse(BigDecimal.ZERO);
+        TypeOfRoomItem getprice =typeOfRoomItemRepository.findByItemId(entity.getItem().getId())
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy request: " + entity.getItem().getId()));
+
+
         return DamagedItemResponseDTO.builder()
                 .requestStaffId(entity.getRequestStaff().getId())
                 .id(entity.getId())
@@ -138,7 +137,7 @@ public class DamagedItemService {
                 .image(entity.getImage())
                 .reportedBy(entity.getUser().getUsername())
                 .reportedAt(entity.getReportedAt())
-                .price(price)
+                .price(getprice.getPrice())
                 .build();
     }
 }

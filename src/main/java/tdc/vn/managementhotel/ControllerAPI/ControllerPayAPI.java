@@ -5,8 +5,10 @@ import java.util.List;
 import java.util.Map;
 
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,26 +23,26 @@ import tdc.vn.managementhotel.service.BookingService;
 import tdc.vn.managementhotel.service.PaymentService;
 import tdc.vn.managementhotel.service.VNPayService;
 
-@CrossOrigin(origins = "*")
+
 @RestController
 @RequestMapping("/api/pay")
+@RequiredArgsConstructor
+@CrossOrigin(originPatterns = "*", allowedHeaders = "*")
 public class ControllerPayAPI {
-    @Autowired
-    private GlobalStore  globalStore;
+
+    private final GlobalStore globalStore;
 
     private final ZaloPayConfig zaloPayService;
 
-    @Autowired
-    private VNPayService vnPayService;
-    @Autowired
-    private PaymentService  paymentService;
-    @Autowired
-    private BookingService bookingService;
 
+    private final VNPayService vnPayService;
 
-    public ControllerPayAPI(ZaloPayConfig zaloPayService) {
-        this.zaloPayService = zaloPayService;
-    }
+    private  final PaymentService  paymentService;
+
+    private final BookingService bookingService;
+
+    private final SimpMessagingTemplate messagingTemplate;
+
 
     @PostMapping("/zalo")
     public ResponseEntity<String> createOrder(@RequestParam long amount) {
@@ -102,6 +104,7 @@ public class ControllerPayAPI {
             System.out.println("cập nhật thành công");
             status = "success";
         }
+        messagingTemplate.convertAndSend("/topic/booking", "trạng thái thanh toán " +status);
         PaymentResponseDTO paymentResponseDTO = new PaymentResponseDTO(null , null, Long.parseLong(totalPrice), status, Long.parseLong(orderInfo), String.valueOf(paymentStatus));
         paymentService.updatePay(paymentResponseDTO);
 
