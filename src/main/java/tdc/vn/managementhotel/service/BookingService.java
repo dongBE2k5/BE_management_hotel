@@ -96,8 +96,14 @@ public class BookingService {
     public BookingResponseDTO updateStatus(ChangeBookingStatusRequestDTO changeBookingStatusRequestDTO) {
         Booking booking = bookingRepository.findById(changeBookingStatusRequestDTO.getBookingId()).orElseThrow(() -> new EntityNotFoundException("Booking not found"));
         booking.setStatus(changeBookingStatusRequestDTO.getNewStatus());
-//        if()
-//        messagingTemplate.convertAndSend("/topic/booking", "Pay success");
+        if(changeBookingStatusRequestDTO.getNewStatus().toString().equals("CHECK_OUT")){
+            Map<String, Object> payload = new HashMap<>();
+            payload.put("type", "CHECKOUT_BOOKING");
+            payload.put("message", "Đã check out thành công ");
+        messagingTemplate.convertAndSend("/topic/booking", payload);
+
+        }
+
         return mapEntityToResponse(bookingRepository.save(booking));
     }
 

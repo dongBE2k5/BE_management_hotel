@@ -3,6 +3,7 @@ package tdc.vn.managementhotel.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import tdc.vn.managementhotel.dto.EmployeeDTO.EmployeeResquestDTO;
 import tdc.vn.managementhotel.dto.LoginRequest;
 import tdc.vn.managementhotel.dto.RegisterRequest;
 import tdc.vn.managementhotel.dto.RoomDTO.RoomResponseDTO;
@@ -10,6 +11,8 @@ import tdc.vn.managementhotel.dto.UserDTO.UserResponse;
 import tdc.vn.managementhotel.entity.Role;
 import tdc.vn.managementhotel.entity.Room;
 import tdc.vn.managementhotel.entity.User;
+import tdc.vn.managementhotel.enums.Position;
+import tdc.vn.managementhotel.repository.EmployeeRepository;
 import tdc.vn.managementhotel.repository.RoleRepository;
 import tdc.vn.managementhotel.repository.UserRepository;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -50,6 +53,10 @@ public class UserService {
             Pattern.compile("^(?=.{6,}$)(?=.*[A-Z])(?=.*[^A-Za-z0-9])\\S+$");
     private static final Pattern GMAIL_PATTERN =
             Pattern.compile("^[A-Za-z0-9._%+-]+@gmail\\.com$");
+    @Autowired
+    private EmployeeRepository employeeRepository;
+    @Autowired
+    private EmployeeService employeeService;
 
     public UserResponse register(RegisterRequest req) {
         if (req.getFullName() == null || req.getFullName().trim().isEmpty()) {
@@ -104,7 +111,7 @@ public class UserService {
     }
 
 
-    public UserResponse registerEmployee(RegisterRequest req) {
+    public UserResponse registerEmployee(RegisterRequest req,Long hotelId) {
         if (userRepository.existsByUsername(req.getUsername())) {
             throw new RuntimeException("Username đã tồn tại");
         }
@@ -112,7 +119,7 @@ public class UserService {
             throw new RuntimeException("Email đã tồn tại");
         }
 
-        Role role = roleRepository.findByName("ROLE_EMPLOYEE")
+        Role role = roleRepository.findByName(req.getRoleName())
                 .orElseThrow(() -> new RuntimeException("Default role ROLE_EMPLOYEE not found."));
 
         User user = new User();
@@ -124,7 +131,20 @@ public class UserService {
 //        user.setCccd(req.getCccd());
         user.setRole(role);
 
-        return mapEntityToResponse(userRepository.save(user));
+
+        User results=userRepository.save(user);
+        EmployeeResquestDTO request = new EmployeeResquestDTO();
+        request.setHotelId(hotelId);
+        request.setUserId(results.getId());
+        if (role.getName().equals("ROLE_EMPLOYEE")){
+
+            request.setPosition(Position.RECEPTIONIST);
+            employeeService.createEmployee(request);
+        } else if (role.getName().equals("ROLE_CLEANING")) {
+            request.setPosition(Position.CLEANING);
+            employeeService.createEmployee(request);
+        }
+        return mapEntityToResponse(results);
     }
 
     public UserResponse registerHost(RegisterRequest req){

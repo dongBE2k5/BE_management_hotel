@@ -3,6 +3,7 @@ package tdc.vn.managementhotel.controllerAPI;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import jakarta.servlet.http.HttpServletResponse;
@@ -70,7 +71,7 @@ public class ControllerPayAPI {
                                        @RequestParam("ip") String ip, HttpServletRequest request) {
 	    String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
 		String vnpayUrl = vnPayService.createOrder(orderTotal, orderInfo, baseUrl);
-        PaymentResponseDTO paymentResponseDTO = new PaymentResponseDTO(null ,method,(long)orderTotal,"Wait for payment",Long.parseLong(orderInfo),null);
+        PaymentResponseDTO paymentResponseDTO = new PaymentResponseDTO(null ,method.toUpperCase(Locale.ROOT),(long)orderTotal,"Wait for payment",Long.parseLong(orderInfo),null);
         paymentService.createPay(paymentResponseDTO);
 
         globalStore.setValue(String.valueOf(orderInfo),ip);
