@@ -8,11 +8,13 @@ import tdc.vn.managementhotel.dto.LoginRequest;
 import tdc.vn.managementhotel.dto.RegisterRequest;
 import tdc.vn.managementhotel.dto.RoomDTO.RoomResponseDTO;
 import tdc.vn.managementhotel.dto.UserDTO.UserResponse;
+import tdc.vn.managementhotel.entity.Hotel;
 import tdc.vn.managementhotel.entity.Role;
 import tdc.vn.managementhotel.entity.Room;
 import tdc.vn.managementhotel.entity.User;
 import tdc.vn.managementhotel.enums.Position;
 import tdc.vn.managementhotel.repository.EmployeeRepository;
+import tdc.vn.managementhotel.repository.HotelRepository;
 import tdc.vn.managementhotel.repository.RoleRepository;
 import tdc.vn.managementhotel.repository.UserRepository;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -57,6 +59,7 @@ public class UserService {
     private EmployeeRepository employeeRepository;
     @Autowired
     private EmployeeService employeeService;
+    private HotelRepository hotelRepository;
 
     public UserResponse register(RegisterRequest req) {
         if (req.getFullName() == null || req.getFullName().trim().isEmpty()) {
@@ -120,8 +123,9 @@ public class UserService {
         }
 
         Role role = roleRepository.findByName(req.getRoleName())
-                .orElseThrow(() -> new RuntimeException("Default role ROLE_EMPLOYEE not found."));
-
+                .orElseThrow(() -> new RuntimeException("Default role  not found."));
+        Hotel hotel =hotelRepository.findById(hotelId)
+                .orElseThrow(() -> new RuntimeException("Hotel id not found."));
         User user = new User();
         user.setUsername(req.getUsername());
         user.setPassword(passwordEncoder.encode(req.getPassword())); // BCrypt encode
@@ -134,7 +138,7 @@ public class UserService {
 
         User results=userRepository.save(user);
         EmployeeResquestDTO request = new EmployeeResquestDTO();
-        request.setHotelId(hotelId);
+        request.setHotelId(hotel.getId());
         request.setUserId(results.getId());
         if (role.getName().equals("ROLE_EMPLOYEE")){
 
