@@ -47,10 +47,15 @@ public class Hotel {
 //    @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL, orphanRemoval = true)
 //    private Set<TypeOfRoomUtility> hotelUtilities = new HashSet<>();
 
+    @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL)
+    private List<Utility> utilities;
 
     @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ImageRoom> imageRooms = new ArrayList<>();
 
     @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL,orphanRemoval = true)
     private List<Employee> employees;
+
+    @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<HotelPaymentType> paymentTypes = new ArrayList<>();
 }

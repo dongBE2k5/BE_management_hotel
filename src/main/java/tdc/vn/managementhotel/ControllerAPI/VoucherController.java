@@ -5,8 +5,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import tdc.vn.managementhotel.dto.ApiResponse;
+import tdc.vn.managementhotel.dto.VoucherDTO.VoucherRequestDTO;
+import tdc.vn.managementhotel.dto.VoucherDTO.VoucherResponseDTO;
 import tdc.vn.managementhotel.entity.Voucher;
 import tdc.vn.managementhotel.repository.VoucherRepository;
+import tdc.vn.managementhotel.service.VoucherService;
 
 import java.util.List;
 import java.util.Optional;
@@ -18,6 +22,8 @@ public class VoucherController {
 
     @Autowired
     private VoucherRepository voucherRepository;
+    @Autowired
+    private VoucherService voucherService;
 
     // Lấy tất cả voucher
     @GetMapping
@@ -39,6 +45,11 @@ public class VoucherController {
             voucher.setInitialQuantity(voucher.getQuantity());
         }
         return voucherRepository.save(voucher);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Voucher> updateVoucher(@PathVariable Long id, @RequestBody VoucherRequestDTO voucherDTO) {
+        return ResponseEntity.ok(voucherService.update(id, voucherDTO));
     }
 
     // Sử dụng voucher: chỉ tăng used, không giảm quantity

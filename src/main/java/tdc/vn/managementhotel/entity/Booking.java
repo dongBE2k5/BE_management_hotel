@@ -40,6 +40,10 @@ public class Booking {
     private LocalDate checkInDate;
     private LocalDate checkOutDate;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "payment_type_id")
+    private HotelPaymentType paymentType;
+
     @Enumerated(EnumType.STRING)
     private BookingStatus status;
 

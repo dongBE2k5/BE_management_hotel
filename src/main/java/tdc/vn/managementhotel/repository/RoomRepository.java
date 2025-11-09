@@ -6,6 +6,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import tdc.vn.managementhotel.entity.Hotel;
 import tdc.vn.managementhotel.entity.Room;
+import tdc.vn.managementhotel.enums.StatusRoom;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -24,7 +25,7 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
     @Query(value = """
     SELECT r.* 
     FROM room r
-    WHERE r.hotel_id = :hotelId 
+    WHERE r.hotel_id = :hotelId and r.status = :status
       AND r.id NOT IN (
           SELECT b.room_id 
           FROM bookings b
@@ -35,7 +36,8 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
     List<Room> findAvailableRooms(
             @Param("hotelId") Long hotelId,
             @Param("checkInDate") LocalDate checkInDate,
-            @Param("checkOutDate") LocalDate checkOutDate
+            @Param("checkOutDate") LocalDate checkOutDate,
+            @Param("status") String status
     );
 
     @Query(value = """
@@ -47,4 +49,19 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
 """, nativeQuery = true)
     Map<String, BigDecimal> findPriceRangeByHotelId(@Param("hotelId") Long hotelId);
 
+    @Query(value = """
+    SELECT r.*
+        FROM room r
+        WHERE status = :status
+          AND r.id IN (
+              SELECT b.room_id
+              FROM bookings b
+              WHERE b.check_in_date = :checkInDate
+          )
+    """, nativeQuery = true)
+    List<Room> findRoomsToSchedule(
+//            @Param("hotelId") Long hotelId,
+            @Param("checkInDate") LocalDate checkInDate,
+            @Param("status") String status
+    );
 }

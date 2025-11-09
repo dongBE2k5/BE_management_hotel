@@ -9,6 +9,7 @@ import tdc.vn.managementhotel.dto.ImageRoomDTO.ImageRoomResponseDTO;
 import tdc.vn.managementhotel.dto.RoomDTO.RoomRequestDTO;
 import tdc.vn.managementhotel.dto.RoomDTO.RoomResponseDTO;
 import tdc.vn.managementhotel.entity.*;
+import tdc.vn.managementhotel.enums.StatusRoom;
 import tdc.vn.managementhotel.repository.*;
 
 import java.time.LocalDate;
@@ -105,9 +106,18 @@ public class RoomService {
     }
 
     public List<RoomResponseDTO> getRoomsAvailable(Long id, LocalDate checkInDate, LocalDate checkOutDate) {
-        return roomRepository.findAvailableRooms(id, checkInDate, checkOutDate).stream()
+        System.out.println( roomRepository.findAvailableRooms(id, checkInDate, checkOutDate, StatusRoom.AVAILABLE.name()).stream()
+                .map(this::mapEntityToResponse)
+                .collect(Collectors.toList()));
+        return roomRepository.findAvailableRooms(id, checkInDate, checkOutDate, StatusRoom.AVAILABLE.name()).stream()
                 .map(this::mapEntityToResponse)
                 .collect(Collectors.toList());
+    }
+
+    public void changeStatusRoomToSchedule() {
+        List<Room> roomList = roomRepository.findRoomsToSchedule(LocalDate.now(), StatusRoom.AVAILABLE.name());
+        roomList.forEach(r -> r.setStatus(StatusRoom.USED));
+        List<Room> savedRooms = roomRepository.saveAll(roomList);
     }
 
     // Map DTO → Entity
