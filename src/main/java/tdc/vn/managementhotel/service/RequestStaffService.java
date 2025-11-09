@@ -32,6 +32,7 @@ public class RequestStaffService {
                 entity.getStatus(),
                 entity.getCreatedAt(),
                 entity.getUpdatedAt()
+
         );
     }
 
@@ -58,7 +59,7 @@ public class RequestStaffService {
      * Tạo request đồng thời gán nhiệm vụ dọn phòng.
      */
     @Transactional
-    public RequestStaffResponseDTO createByRoomAssignment(RequestStaffRequestDTO dto, Long roomId) {
+    public RequestStaffResponseDTO createByRoomAssignment(RequestStaffRequestDTO dto, Long roomId,Long bookingId) {
         // 1. Tạo yêu cầu nhân viên
         RequestStaff saved = repo.save(mapToEntity(dto));
 
@@ -68,7 +69,8 @@ public class RequestStaffService {
                 dto.getSenderId(),   // người gửi yêu cầu (lễ tân)
                 dto.getReceiverId(), // nhân viên dọn phòng
                 saved.getId(),
-                dto.getContent()
+                dto.getContent(),
+                bookingId
         );
 
         // Quan trọng: assignRoom phải trả về DTO, KHÔNG trả entity RoomAssignment

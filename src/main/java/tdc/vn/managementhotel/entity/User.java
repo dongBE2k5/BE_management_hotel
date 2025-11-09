@@ -40,8 +40,6 @@ public class User {
     @JsonIgnore
     private List<Employee> employees;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<DamagedItem> damagedItems;
 
 
 }

@@ -16,5 +16,6 @@ public class RoomAssignmentRequestDTO {
     private Long assignedById;  // Người giao nhiệm vụ (quản lý hoặc lễ tân)
     private Long requestId;
     private String note;        // Ghi chú thêm (nếu có)
+    private  Long bookingId;
 }
 

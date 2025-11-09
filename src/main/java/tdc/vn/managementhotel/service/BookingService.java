@@ -23,7 +23,10 @@ import tdc.vn.managementhotel.enums.StatusRoom;
 import tdc.vn.managementhotel.repository.*;
 
 import org.springframework.data.domain.Pageable;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -56,8 +59,12 @@ public class BookingService {
 
         Booking saved = bookingRepository.save(booking);
 
-        // 🚀 Gửi realtime đến tất cả client đang lắng nghe "/topic/booking"
-        messagingTemplate.convertAndSend("/topic/booking", saved);
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("type", "NEW_BOOKING");
+        payload.put("message", "New booking created");
+        payload.put("bookingId", saved.getId());
+
+        messagingTemplate.convertAndSend("/topic/booking", payload);
         return mapEntityToResponse(saved);
     }
     public List<BookingResponseDTO> all() {
@@ -89,6 +96,8 @@ public class BookingService {
     public BookingResponseDTO updateStatus(ChangeBookingStatusRequestDTO changeBookingStatusRequestDTO) {
         Booking booking = bookingRepository.findById(changeBookingStatusRequestDTO.getBookingId()).orElseThrow(() -> new EntityNotFoundException("Booking not found"));
         booking.setStatus(changeBookingStatusRequestDTO.getNewStatus());
+//        if()
+//        messagingTemplate.convertAndSend("/topic/booking", "Pay success");
         return mapEntityToResponse(bookingRepository.save(booking));
     }
 

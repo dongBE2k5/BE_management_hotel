@@ -25,6 +25,7 @@ public class RoomAssignmentService {
     private final EmployeeRepository employeeRepository;
     private final UserRepository userRepository;
     private final RequestStaffRepository requestRepository;
+    private final BookingRepository bookingRepository;
 
     public RoomAssignmentResponseDTO mapEntityToResponse(RoomAssignment entity) {
         RoomAssignmentResponseDTO dto = new RoomAssignmentResponseDTO();
@@ -42,6 +43,7 @@ public class RoomAssignmentService {
         dto.setCompletedAt(entity.getCompletedAt());
         dto.setRequestId(entity.getRequestStaff().getId());
         dto.setAcceptedAt(entity.getAcceptedAt());
+        dto.setBookingId(entity.getBooking().getId());
         return dto;
     }
 
@@ -59,6 +61,8 @@ public class RoomAssignmentService {
 
         RequestStaff requestStaff = requestRepository.findById(requestDTO.getRequestId())
                 .orElseThrow(() -> new RuntimeException("Request not found"));
+        Booking booking = bookingRepository.findById(requestDTO.getBookingId())
+                        .orElseThrow(() -> new RuntimeException("Booking not found"));
 
         room.setStatus(StatusRoom.REQUEST);
         roomRepository.save(room);
@@ -71,8 +75,9 @@ public class RoomAssignmentService {
         assignment.setStatus(AssignmentStatus.PENDING);
         assignment.setAssignedAt(LocalDateTime.now());
         assignment.setRequestStaff(requestStaff);
+        assignment.setBooking(booking);
         RoomAssignment saved = roomAssignmentRepository.save(assignment);
-    ;
+
         return mapEntityToResponse(saved);
     }
 
@@ -105,7 +110,8 @@ public class RoomAssignmentService {
 
     // --- Lấy danh sách phân công theo nhân viên ---
     public List<RoomAssignmentResponseDTO> getAssignmentsByEmployee(Long employeeId) {
-        Employee employee = employeeRepository.findEmployeeByUserId(employeeId);
+        Employee employee = employeeRepository.findByUserId(employeeId)
+                .orElseThrow(() -> new RuntimeException("Employee not found"));
         return roomAssignmentRepository.findByEmployeeId(employee.getId())
                 .stream()
                 .map(this::mapEntityToResponse)

@@ -21,4 +21,5 @@ public class DamagedItemRequestDTO {
     private String image;
     private Long reportedBy;
     private Long requestStaffId;
+    private Long bookingId;
 }

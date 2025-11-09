@@ -33,11 +33,10 @@ public class RequestStaff {
     private LocalDateTime updatedAt = LocalDateTime.now();
 
     @OneToMany(mappedBy = "requestStaff",cascade = CascadeType.ALL,orphanRemoval = true)
-    @JsonIgnore
     private List<RoomAssignment> roomAssignments;
 
     @OneToMany(mappedBy = "requestStaff",cascade = CascadeType.ALL,orphanRemoval = true)
-    @JsonIgnore
+
     private List<DamagedItem> damagedItems;
 
 

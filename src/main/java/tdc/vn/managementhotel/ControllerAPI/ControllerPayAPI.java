@@ -1,6 +1,7 @@
 package tdc.vn.managementhotel.controllerAPI;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -16,6 +17,7 @@ import jakarta.websocket.server.PathParam;
 import org.springframework.web.servlet.view.RedirectView;
 import tdc.vn.managementhotel.config.GlobalStore;
 import tdc.vn.managementhotel.config.ZaloPayConfig;
+import tdc.vn.managementhotel.dto.ApiResponse;
 import tdc.vn.managementhotel.dto.BookingDTO.ChangeBookingStatusRequestDTO;
 import tdc.vn.managementhotel.dto.PaymentDTO.PaymentResponseDTO;
 import tdc.vn.managementhotel.enums.BookingStatus;
@@ -103,8 +105,12 @@ public class ControllerPayAPI {
             bookingService.updateStatus(dto);
             System.out.println("cập nhật thành công");
             status = "success";
+            Map<String, Object> payload = new HashMap<>();
+            payload.put("message", "Payment success booking");
+            payload.put("bookingId", orderInfo);
+
+            messagingTemplate.convertAndSend("/topic/booking", payload);
         }
-        messagingTemplate.convertAndSend("/topic/booking", "trạng thái thanh toán " +status);
         PaymentResponseDTO paymentResponseDTO = new PaymentResponseDTO(null , null, Long.parseLong(totalPrice), status, Long.parseLong(orderInfo), String.valueOf(paymentStatus));
         paymentService.updatePay(paymentResponseDTO);
 
@@ -127,5 +133,13 @@ public class ControllerPayAPI {
         return ResponseEntity.ok(paymentService.getAll());
     }
 
+    @PostMapping("/createpaymanual")
+    public ResponseEntity<ApiResponse<PaymentResponseDTO>> manualpayment(@RequestParam("amount") int orderTotal,
+                                                                         @RequestParam("orderInfo") String orderInfo,
+                                                                         @RequestParam("method") String method){
+        PaymentResponseDTO paymentResponseDTO = new PaymentResponseDTO(null ,method,(long)orderTotal,"success",Long.parseLong(orderInfo),null);
+        paymentService.createPay(paymentResponseDTO);
 
+        return ResponseEntity.ok(ApiResponse.success("Thanh toán thành công",paymentResponseDTO));
+    }
 }

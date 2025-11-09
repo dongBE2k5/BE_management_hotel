@@ -24,6 +24,8 @@ public class DamagedItemService {
     private final TypeOfRoomItemRepository typeOfRoomItemRepository;
     private final UserRepository userRepository;
     private final RequestStaffRepository requestStaffRepository;
+    private final BookingRepository bookingRepository;
+    private final EmployeeRepository employeeRepository;
 
     @Transactional
     public DamagedItemResponseDTO reportDamage(DamagedItemRequestDTO dto) {
@@ -34,19 +36,25 @@ public class DamagedItemService {
         Item item = itemRepository.findById(dto.getItemId())
                 .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy vật phẩm ID: " + dto.getItemId()));
 
-        User user = userRepository.findById(dto.getReportedBy())
+//        User user = userRepository.findById(dto.getReportedBy())
+//                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy user: " + dto.getReportedBy()));
+        Employee employee = employeeRepository.findEmployeeByUserId(dto.getReportedBy())
                 .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy user: " + dto.getReportedBy()));
 
         RequestStaff requestStaff = requestStaffRepository.findById(dto.getRequestStaffId())
                 .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy requestStaff: " + dto.getRequestStaffId()));
+
+        Booking booking = bookingRepository.findById(dto.getBookingId())
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy requestStaff: " + dto.getBookingId()));
         DamagedItem entity = new DamagedItem();
         entity.setRoom(room);
         entity.setItem(item);
         entity.setQuantityAffected(dto.getQuantityAffected());
         entity.setStatus(dto.getStatus());
         entity.setImage(dto.getImage());
-        entity.setUser(user);
+        entity.setEmployee(employee);
         entity.setRequestStaff(requestStaff);
+        entity.setBooking(booking);
         DamagedItem saved = damagedItemRepository.save(entity);
         return mapToResponse(saved);
     }
@@ -62,10 +70,15 @@ public class DamagedItemService {
         Room room = roomRepository.findById(roomId)
                 .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy phòng ID: " + roomId));
 
-        User user = userRepository.findById(dtoList.get(0).getReportedBy())
+//        User user = userRepository.findById(dtoList.get(0).getReportedBy())
+//                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy user: " + dtoList.get(0).getReportedBy()));
+        Employee employee = employeeRepository.findEmployeeByUserId(dtoList.get(0).getReportedBy())
                 .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy user: " + dtoList.get(0).getReportedBy()));
         RequestStaff requestStaff = requestStaffRepository.findById(dtoList.get(0).getRequestStaffId())
                 .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy requestStaff: " + dtoList.get(0).getRequestStaffId()));
+
+        Booking booking = bookingRepository.findById(dtoList.get(0).getBookingId())
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy booking: " + dtoList.get(0).getBookingId()));
         // Đảm bảo tất cả cùng 1 phòng
         boolean allSameRoom = dtoList.stream().allMatch(d -> d.getRoomId().equals(roomId));
         if (!allSameRoom) {
@@ -82,8 +95,9 @@ public class DamagedItemService {
             entity.setQuantityAffected(dto.getQuantityAffected());
             entity.setStatus(dto.getStatus());
             entity.setImage(dto.getImage());
-            entity.setUser(user);
+            entity.setEmployee(employee);
             entity.setRequestStaff(requestStaff);
+            entity.setBooking(booking);
             return damagedItemRepository.save(entity);
         }).collect(Collectors.toList());
 
@@ -120,6 +134,15 @@ public class DamagedItemService {
                 .collect(Collectors.toList());
     }
 
+    public List<DamagedItemResponseDTO> getByBooking(Long bookingId) {
+
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy booking: " + bookingId));
+        return damagedItemRepository.findByBooking(booking)
+                .stream().map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
     private DamagedItemResponseDTO mapToResponse(DamagedItem entity) {
         TypeOfRoomItem getprice =typeOfRoomItemRepository.findByItemId(entity.getItem().getId())
                 .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy request: " + entity.getItem().getId()));
@@ -135,9 +158,10 @@ public class DamagedItemService {
                 .quantityAffected(entity.getQuantityAffected())
                 .status(entity.getStatus())
                 .image(entity.getImage())
-                .reportedBy(entity.getUser().getUsername())
+                .reportedBy(entity.getEmployee().getUser().getFullName())
                 .reportedAt(entity.getReportedAt())
                 .price(getprice.getPrice())
+                .bookingId(entity.getBooking().getId())
                 .build();
     }
 }

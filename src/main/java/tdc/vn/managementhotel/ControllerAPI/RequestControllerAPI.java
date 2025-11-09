@@ -39,9 +39,9 @@ public class RequestControllerAPI {
     // User A gửi request cho B
     @PostMapping
     @Transactional
-    public ResponseEntity<ApiResponse<RequestStaffResponseDTO>> create(@RequestBody RequestStaffRequestDTO req , @RequestParam Long roomId) {
+    public ResponseEntity<ApiResponse<RequestStaffResponseDTO>> create(@RequestBody RequestStaffRequestDTO req , @RequestParam Long roomId,@RequestParam Long bookingId) {
         req.setStatus(RequestStatus.SENT);
-        RequestStaffResponseDTO saved = requestStaffService.createByRoomAssignment(req,roomId);
+        RequestStaffResponseDTO saved = requestStaffService.createByRoomAssignment(req,roomId,bookingId);
 
         // Gửi realtime tới B
 //        System.out.println("Request create"+saved.getId().toString());

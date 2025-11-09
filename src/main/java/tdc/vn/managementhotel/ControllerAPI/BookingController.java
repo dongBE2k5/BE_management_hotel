@@ -50,7 +50,7 @@ public class BookingController {
     @GetMapping("/hotel/{id}")
     public ResponseEntity<List<BookingResponseDTO>> getAllBookingsByHotelId(@PathVariable Long id) {
         List<BookingResponseDTO> bookings = bookingService.findByHotelID(id);
-
+        System.out.println("booking"+bookings);
         if (bookings.isEmpty()) {
             return ResponseEntity.noContent().build(); // 204 No Content
         }

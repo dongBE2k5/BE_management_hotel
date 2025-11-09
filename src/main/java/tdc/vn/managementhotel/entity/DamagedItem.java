@@ -1,5 +1,6 @@
 package tdc.vn.managementhotel.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -22,10 +23,12 @@ public class DamagedItem {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id", nullable = false)
+    @JsonIgnore
     private Item item;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_id", nullable = false)
+    @JsonIgnore
     private Room room;
 
     private int quantityAffected; // số lượng bị hư hoặc mất
@@ -37,12 +40,19 @@ public class DamagedItem {
     private String image;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id",nullable = false)
-    private User user;
+    @JoinColumn(name = "employee_id",nullable = false)
+    @JsonIgnore
+    private Employee employee;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "request_staff_id" ,nullable = false)
+    @JsonIgnore
     private RequestStaff requestStaff;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "booking_id" ,nullable = false)
+    @JsonIgnore
+    private Booking booking;
 
     private LocalDateTime reportedAt = LocalDateTime.now();
 }

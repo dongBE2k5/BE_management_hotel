@@ -13,8 +13,8 @@ import tdc.vn.managementhotel.enums.Position;
 @AllArgsConstructor
 public class EmployeeResquestDTO {
     private Long id;
-    private User userId;
-    private Hotel hotelId;
+    private Long userId;
+    private Long hotelId;
     private Position position;
 
 }

@@ -2,14 +2,18 @@ package tdc.vn.managementhotel.controllerAPI;
 
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import tdc.vn.managementhotel.dto.ApiResponse;
 import tdc.vn.managementhotel.dto.DamageItemDTO.DamagedItemRequestDTO;
 import tdc.vn.managementhotel.dto.DamageItemDTO.DamagedItemResponseDTO;
 import tdc.vn.managementhotel.service.DamagedItemService;
+import tdc.vn.managementhotel.service.FileUploadService;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -19,6 +23,7 @@ import java.util.List;
 public class DamagedItemControllerAPI {
 
     private final DamagedItemService damagedItemService;
+    private final FileUploadService fileUploadService;
 
     /**
      * 🧾 Báo hư hại một vật phẩm
@@ -26,8 +31,12 @@ public class DamagedItemControllerAPI {
     @PostMapping
     @Transactional
     public ResponseEntity<ApiResponse<DamagedItemResponseDTO>> reportDamage(
-            @RequestBody DamagedItemRequestDTO request) {
-
+            @RequestPart(value = "data") DamagedItemRequestDTO request,
+            @RequestPart(value = "image", required = false) MultipartFile image) throws IOException {
+        System.out.println(image);
+        if (image != null ){
+            request.setImage(fileUploadService.uploadImage(image));
+        }
         DamagedItemResponseDTO result = damagedItemService.reportDamage(request);
         return ResponseEntity.ok(ApiResponse.success("Báo cáo hư hại thành công", result));
     }

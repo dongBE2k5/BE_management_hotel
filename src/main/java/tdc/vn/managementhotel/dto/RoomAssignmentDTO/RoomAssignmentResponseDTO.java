@@ -33,4 +33,6 @@ public class RoomAssignmentResponseDTO {
     private LocalDateTime assignedAt;
     private LocalDateTime acceptedAt;
     private LocalDateTime completedAt;
+
+    private Long bookingId;
 }

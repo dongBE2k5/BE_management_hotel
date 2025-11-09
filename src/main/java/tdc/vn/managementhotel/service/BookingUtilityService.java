@@ -61,6 +61,7 @@ public class BookingUtilityService {
                 .map(bu -> BookingUtilityResponseDTO.UtilityItemBookingResponse.builder()
                         .utilityName(bu.getUtility().getName())
                         .quantity(bu.getQuantity())
+                        .price(bu.getUtility().getPrice())
                         .build())
                 .collect(Collectors.toList());
 

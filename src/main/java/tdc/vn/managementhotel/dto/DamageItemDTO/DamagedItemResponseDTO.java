@@ -26,4 +26,5 @@ public class DamagedItemResponseDTO {
     private String reportedBy;
     private LocalDateTime reportedAt;
     private BigDecimal price;
+    private Long bookingId;
 }

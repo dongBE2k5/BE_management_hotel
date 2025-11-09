@@ -9,8 +9,11 @@ import tdc.vn.managementhotel.dto.EmployeeDTO.EmployeeResponseDTO;
 import tdc.vn.managementhotel.dto.EmployeeDTO.EmployeeResquestDTO;
 import tdc.vn.managementhotel.dto.UserDTO.UserResponse;
 import tdc.vn.managementhotel.entity.Employee;
+import tdc.vn.managementhotel.entity.Hotel;
 import tdc.vn.managementhotel.entity.User;
 import tdc.vn.managementhotel.repository.EmployeeRepository;
+import tdc.vn.managementhotel.repository.HotelRepository;
+import tdc.vn.managementhotel.repository.UserRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,6 +23,8 @@ import java.util.stream.Collectors;
 public class EmployeeService {
 
     private final EmployeeRepository employeeRepository;
+    private final UserRepository userRepository;
+    private final HotelRepository hotelRepository;
 
     //    created
     public EmployeeResponseDTO createEmployee(EmployeeResquestDTO employeeResquestDTO) {
@@ -30,7 +35,8 @@ public class EmployeeService {
 
     //    update
     public EmployeeResponseDTO updateEmployee(Long id, EmployeeResquestDTO employeeResquestDTO) {
-        Employee employee = employeeRepository.findEmployeeByUserId((id));
+        Employee employee = employeeRepository.findEmployeeByUserId((id))
+                .orElseThrow(() -> new RuntimeException("Employee not found"));
         mapDtoToEntity(employeeResquestDTO, employee);
         return mapEntityToResponse(employeeRepository.save(employee));
     }
@@ -60,11 +66,20 @@ public class EmployeeService {
 
 
     // Map ResquestDTO → Entity
-    private void mapDtoToEntity(EmployeeResquestDTO employeeResquestDTO, Employee employee) {
-        employee.setId(employeeResquestDTO.getId());
-        employee.setUser(employeeResquestDTO.getUserId());
-        employee.setHotel(employeeResquestDTO.getHotelId());
-        employee.setPosition(employeeResquestDTO.getPosition());
+    private void mapDtoToEntity(EmployeeResquestDTO dto, Employee employee) {
+        if (dto.getUserId() != null) {
+            User user = userRepository.findById(dto.getUserId())
+                    .orElseThrow(() -> new EntityNotFoundException("User not found"));
+            employee.setUser(user);
+        }
+
+        if (dto.getHotelId() != null) {
+            Hotel hotel = hotelRepository.findById(dto.getHotelId())
+                    .orElseThrow(() -> new EntityNotFoundException("Hotel not found"));
+            employee.setHotel(hotel);
+        }
+
+        employee.setPosition(dto.getPosition());
     }
 
     ;

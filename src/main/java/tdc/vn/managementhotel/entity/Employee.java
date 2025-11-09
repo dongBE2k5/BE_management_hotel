@@ -15,7 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 public class Employee {
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
     private Long id;
 
     @Enumerated(EnumType.STRING)
@@ -34,6 +34,10 @@ public class Employee {
     @OneToMany(mappedBy = "employee",cascade = CascadeType.ALL)
     @JsonIgnore
     private List<RoomAssignment> roomAssignments;
+
+    @OneToMany(mappedBy = "employee",cascade = CascadeType.ALL)
+    @JsonIgnore
+    private List<DamagedItem> damagedItems;
 
 
 }

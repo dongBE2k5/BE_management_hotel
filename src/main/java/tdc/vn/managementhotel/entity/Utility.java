@@ -1,5 +1,6 @@
 package tdc.vn.managementhotel.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,13 +22,19 @@ public class Utility extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String name;
     private String imageUrl;
     @Enumerated(EnumType.STRING)
     private UtilityType type;
+
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "hotel_id", nullable = false)
+    @JoinColumn(name = "hotel_id", nullable = false,referencedColumnName = "id")
+//    @MapsId("hotelId")
     private Hotel hotel;
+
+
     private BigDecimal price;
 
     @Enumerated(EnumType.STRING)

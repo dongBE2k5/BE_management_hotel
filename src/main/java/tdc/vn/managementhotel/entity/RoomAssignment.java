@@ -30,6 +30,13 @@ public class RoomAssignment {
     @JsonIgnore
     private RequestStaff requestStaff;
 
+
+    // resquest
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "booking_id", nullable = false, referencedColumnName = "id")
+    @JsonIgnore
+    private Booking booking;
+
     // Phòng được giao dọn
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_id", nullable = false)

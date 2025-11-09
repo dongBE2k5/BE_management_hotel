@@ -12,6 +12,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Data
@@ -56,5 +57,12 @@ public class Booking {
     // 🕒 Thời điểm cập nhật trạng thái
     @UpdateTimestamp
     private LocalDateTime updatedAt;
+
+
+    @OneToMany(mappedBy = "booking",cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RoomAssignment> roomAssignments;
+
+    @OneToMany(mappedBy = "booking",cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DamagedItem> damagedItems;
 
 }

@@ -2,6 +2,7 @@ package tdc.vn.managementhotel.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tdc.vn.managementhotel.dto.HostHotelDTO.HostHotelRequestDTO;
@@ -13,7 +14,9 @@ import tdc.vn.managementhotel.enums.HostHotelStatus;
 import tdc.vn.managementhotel.repository.HostHotelRepository;
 import tdc.vn.managementhotel.repository.UserRepository;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -22,6 +25,7 @@ public class HostHotelService {
 
     private final HostHotelRepository hostHotelRepository;
     private final UserRepository userRepository;
+    private final SimpMessagingTemplate simpMessagingTemplate;
 
     /**
      * ➕ Tạo hoặc cập nhật thông tin chủ khách sạn
@@ -49,6 +53,13 @@ public class HostHotelService {
         hostHotel.setGiayPhepKinhDoanh(dto.getGiayPhepKinhDoanh());
         hostHotel.setStatus(HostHotelStatus.PENDING);
         HostHotel saved = hostHotelRepository.save(hostHotel);
+
+        Map<String,Object> payload = new HashMap<>();
+        payload.put("type","NEWHOST");
+        payload.put("message","Đã thêm thành công 1 chủ khách sạn");
+        payload.put("data",mapToResponse(saved));
+        simpMessagingTemplate.convertAndSend("/topic/hosts",payload);
+
         return mapToResponse(saved);
     }
 
