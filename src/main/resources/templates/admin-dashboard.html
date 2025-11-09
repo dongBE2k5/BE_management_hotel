@@ -22,6 +22,18 @@
     <i class="bi bi-check-circle-fill"></i>
     <span id="toast-message">Nội dung thông báo ở đây</span>
 </div>
+
+<div id="image-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4">
+    <div id="modal-bg-close" class="absolute inset-0"></div>
+
+    <div class="relative bg-white p-2 rounded-lg shadow-lg z-10">
+        <img id="modal-image" src="" alt="Chi tiết ảnh" class="object-contain max-h-[90vh] max-w-[90vw]">
+    </div>
+
+    <button id="modal-close-btn" class="absolute top-4 right-4 text-white text-3xl z-20 hover:opacity-75">
+        <i class="bi bi-x-lg"></i>
+    </button>
+</div>
 <div class="flex">
     <div class="w-64 min-h-screen bg-gradient-to-b from-blue-800 to-blue-900 text-white p-4 fixed">
         <h2 class="text-2xl font-bold text-center py-6 mb-4">Admin Panel</h2>
@@ -70,15 +82,17 @@
                         <td class="px-6 py-4 text-sm text-gray-700" th:text="${host.stk}"></td>
 
                         <td>
-                            <img th:src="@{'/uploads/' + ${host.cccdMatTruoc}}" alt="CCCD Trước" class="w-16 h-10 object-cover rounded-md shadow-sm">
+                            <img th:src="@{'/uploads/' + ${host.cccdMatTruoc}}" alt="CCCD Trước"
+                                 class="w-16 h-10 object-cover rounded-md shadow-sm hinh-anh-chi-tiet cursor-pointer transition-transform hover:scale-110">
                         </td>
                         <td>
-                            <img th:src="@{'/uploads/' + ${host.cccdMatSau}}" alt="CCCD Sau" class="w-16 h-10 object-cover rounded-md shadow-sm">
+                            <img th:src="@{'/uploads/' + ${host.cccdMatSau}}" alt="CCCD Sau"
+                                 class="w-16 h-10 object-cover rounded-md shadow-sm hinh-anh-chi-tiet cursor-pointer transition-transform hover:scale-110">
                         </td>
                         <td>
-                            <img th:src="@{'/uploads/' + ${host.giayPhepKinhDoanh}}" alt="Giấy phép KD" class="w-16 h-10 object-cover rounded-md shadow-sm">
+                            <img th:src="@{'/uploads/' + ${host.giayPhepKinhDoanh}}" alt="Giấy phép KD"
+                                 class="w-16 h-10 object-cover rounded-md shadow-sm hinh-anh-chi-tiet cursor-pointer transition-transform hover:scale-110">
                         </td>
-
                         <td class="px-6 py-4">
                             <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full"
                                   th:classappend="
@@ -88,7 +102,6 @@
                                   th:text="${host.status}">
                             </span>
                         </td>
-
                         <td class="px-6 py-4 text-sm font-medium" th:switch="${host.status}">
                             <div class="flex items-center gap-2">
                                 <form th:case="'PENDING'"
@@ -146,35 +159,56 @@
 <script>
     document.addEventListener("DOMContentLoaded",()=>{
 
-        // === THÊM MỚI 2: Biến timer và Hàm hiển thị Toast ===
-        let toastTimer; // Biến để giữ timer, giúp reset nếu có toast mới
-
+        let toastTimer;
         function showToast(message) {
             const toast = document.getElementById("toast-notification");
             const toastMessage = document.getElementById("toast-message");
-
             if (!toast || !toastMessage) return;
-
-            // 1. Đặt nội dung
             toastMessage.innerText = message;
-
-            // 2. Hiện toast
             toast.classList.remove("hidden");
-
-            // 3. Xóa timer cũ (nếu đang có 1 toast khác)
             if (toastTimer) {
                 clearTimeout(toastTimer);
             }
-
-            // 4. Tự động ẩn sau 3 giây
             toastTimer = setTimeout(() => {
                 toast.classList.add("hidden");
-            }, 3000); // 3000ms = 3 giây
+            }, 3000);
         }
-        // === KẾT THÚC THÊM MỚI 2 ===
 
 
-        // --- Code WebSocket của bạn ---
+        // === THÊM MỚI 3: LOGIC CHO IMAGE MODAL ===
+        const modal = document.getElementById("image-modal");
+        const modalImage = document.getElementById("modal-image");
+        const closeModalBtn = document.getElementById("modal-close-btn");
+        const modalBgClose = document.getElementById("modal-bg-close");
+
+        if (modal && modalImage && closeModalBtn && modalBgClose) {
+
+            // 1. Dùng event delegation để bắt click trên body
+            //    Cách này hoạt động cho cả ảnh có sẵn (Thymeleaf) và ảnh mới (WebSocket)
+            document.body.addEventListener("click", function(event) {
+                // 2. Kiểm tra xem có click vào ảnh thumbnail không
+                if (event.target.classList.contains("hinh-anh-chi-tiet")) {
+                    // 3. Lấy src và mở modal
+                    const src = event.target.getAttribute("src");
+                    modalImage.setAttribute("src", src);
+                    modal.classList.remove("hidden");
+                }
+            });
+
+            // 4. Logic đóng modal (Nút X)
+            closeModalBtn.addEventListener("click", () => {
+                modal.classList.add("hidden");
+            });
+
+            // 5. Logic đóng modal (Click nền)
+            modalBgClose.addEventListener("click", () => {
+                modal.classList.add("hidden");
+            });
+        }
+        // === KẾT THÚC THÊM MỚI 3 ===
+
+
+        // --- Code WebSocket (Giữ nguyên) ---
         const  socket= new SockJS("/ws");
         const  stompClient=Stomp.over(socket);
 
@@ -182,25 +216,18 @@
             console.log("connected",frame)
             stompClient.subscribe('/topic/hosts',(message)=>{
                 const payload = JSON.parse(message.body);
-
-                // === THÊM MỚI 3: Gọi hàm showToast ===
-                // Sửa lỗi: payload.message() không đúng, và logic nên ở đây
                 if (payload.type === "NEWHOST"){
-                    // Lấy message từ payload, hoặc dùng 1 message mặc định
                     const notificationMessage = payload.message || `Chủ khách sạn ${payload.data.cccd} vừa đăng ký.`;
                     showToast(notificationMessage);
                 }
-                // === KẾT THÚC THÊM MỚI 3 ===
-
-                // Cập nhật bảng (vẫn giữ nguyên)
                 addOrUpdateHostRow(payload.data)
             })
         })
+
         function addOrUpdateHostRow(host) {
             const tableBody = document.querySelector("table tbody");
             if (!tableBody) return;
 
-            // Xóa dòng "Không có dữ liệu" nếu nó đang tồn tại
             const emptyRow = tableBody.querySelector("td[colspan='9']");
             if (emptyRow) {
                 emptyRow.parentElement.remove();
@@ -221,14 +248,15 @@
             } else {
                 // Thêm hàng mới
                 const newRow = document.createElement("tr");
+                // === CẬP NHẬT ẢNH TRONG HÀNG MỚI (THÊM CSS CLASS) ===
                 newRow.innerHTML = `
                 <td class="px-6 py-4 text-sm text-gray-700">NEW</td>
                 <td class="px-6 py-4 text-sm text-gray-700">${host.cccd}</td>
                 <td class="px-6 py-4 text-sm text-gray-700">${host.nganHang}</td>
                 <td class="px-6 py-4 text-sm text-gray-700">${host.stk}</td>
-                <td class="px-6 py-4"><img src="/uploads/${host.cccdMatTruoc}" class="w-16 h-10 object-cover rounded-md shadow-sm"></td>
-                <td class="px-6 py-4"><img src="/uploads/${host.cccdMatSau}" class="w-16 h-10 object-cover rounded-md shadow-sm"></td>
-                <td class="px-6 py-4"><img src="/uploads/${host.giayPhepKinhDoanh}" class="w-16 h-10 object-cover rounded-md shadow-sm"></td>
+                <td class="px-6 py-4"><img src="/uploads/${host.cccdMatTruoc}" class="w-16 h-10 object-cover rounded-md shadow-sm hinh-anh-chi-tiet cursor-pointer"></td>
+                <td class="px-6 py-4"><img src="/uploads/${host.cccdMatSau}" class="w-16 h-10 object-cover rounded-md shadow-sm hinh-anh-chi-tiet cursor-pointer"></td>
+                <td class="px-6 py-4"><img src="/uploads/${host.giayPhepKinhDoanh}" class="w-16 h-10 object-cover rounded-md shadow-sm hinh-anh-chi-tiet cursor-pointer"></td>
                 <td class="px-6 py-4">
                     <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass(host.status)}">
                         ${host.status}
@@ -244,7 +272,6 @@
                     </form>
                 </td>
             `;
-                // Thêm vào đầu bảng
                 tableBody.prepend(newRow);
             }
         }

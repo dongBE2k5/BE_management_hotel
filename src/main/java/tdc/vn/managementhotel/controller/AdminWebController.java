@@ -87,6 +87,7 @@ public class AdminWebController {
         try {
             userService.registerHost(registerRequest);
             model.addAttribute("success", "Đăng ký thành công!");
+            model.addAttribute("loginRequest", new LoginRequest());
             return "login"; // chuyển sang trang login
         } catch (RuntimeException ex) {
             model.addAttribute("error", ex.getMessage());
