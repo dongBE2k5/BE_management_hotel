@@ -46,6 +46,9 @@ public class TypeOfRoom {
     )
     private Set<Room> rooms = new HashSet<>();
 
+    @OneToMany(mappedBy = "typeOfRoom", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<HotelPaymentType> hotelPaymentTypes = new ArrayList<>();
+
 
 
 

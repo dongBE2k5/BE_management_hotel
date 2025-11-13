@@ -17,6 +17,7 @@ public class BookingRequestDTO {
     private Long roomId;
     private Long userId;
     private List<Long> voucherIds;
-
     private BigDecimal totalPrice;
+    private BigDecimal paidPrice;
+    private Long hotelPaymentTypeId;
 }

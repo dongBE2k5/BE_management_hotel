@@ -9,4 +9,8 @@ import java.util.List;
 @Repository
 public interface HotelPaymentTypeRepository extends JpaRepository<HotelPaymentType, Long> {
     List<HotelPaymentType> findByHotelId(Long hotelId);
+
+    boolean existsByHotelIdAndPaymentTypeIdAndTypeOfRoom_Id(Long hotelId, Long paymentTypeId, Long typeOfRoomId);
+
+    List<HotelPaymentType> findByHotelIdAndPaymentTypeId(Long hotelId, Long paymentTypeId);
 }

@@ -42,13 +42,15 @@ public class Booking {
     private LocalDate checkOutDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "payment_type_id")
-    private HotelPaymentType paymentType;
+    @JoinColumn(name = "hotel_payment_type_id")
+    private HotelPaymentType hotelPaymentType;
 
     @Enumerated(EnumType.STRING)
     private BookingStatus status;
 
     private BigDecimal totalPrice;
+
+    private BigDecimal paidPrice;
 
     // 🕒 Thời điểm tạo booking (tự động lưu)
     @Column(updatable = false)

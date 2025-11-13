@@ -38,6 +38,7 @@ public class BookingService {
     private final HistoryChangeBookingStatusRepo historyChangeBookingStatusRepo;
     private final HotelRepository hotelRepository;
     private final SimpMessagingTemplate messagingTemplate;
+    private final HotelPaymentTypeRepository hotelPaymentTypeRepository;
 
     @Autowired
     private VoucherRepository voucherRepository;
@@ -45,6 +46,7 @@ public class BookingService {
     @Transactional
     public BookingResponseDTO create(BookingRequestDTO bookingDTO) {
         Booking booking = new Booking();
+        System.out.println(bookingDTO);
         mapDtoToEntity(bookingDTO, booking);
 
         // ✅ nếu có voucherId thì gán voucher
@@ -105,7 +107,18 @@ public class BookingService {
     private void mapDtoToEntity(BookingRequestDTO dto, Booking booking) {
         booking.setCheckInDate(dto.getCheckInDate());
         booking.setCheckOutDate(dto.getCheckOutDate());
-        booking.setStatus(BookingStatus.CHUA_THANH_TOAN);
+        HotelPaymentType hotelPaymentType = hotelPaymentTypeRepository.findById(dto.getHotelPaymentTypeId())
+                .orElseThrow(() -> new EntityNotFoundException("Location not found"));
+        booking.setHotelPaymentType(hotelPaymentType);
+        if (hotelPaymentType.getPaymentType().getId() == 1) {
+            booking.setStatus(BookingStatus.DA_THANH_TOAN);
+            booking.setPaidPrice(dto.getPaidPrice());
+        }else if (hotelPaymentType.getPaymentType().getId() == 2) {
+            booking.setStatus(BookingStatus.DA_COC);
+            booking.setPaidPrice(dto.getPaidPrice());
+        }else {
+            booking.setStatus(BookingStatus.CHUA_THANH_TOAN);
+        }
         booking.setTotalPrice(dto.getTotalPrice());
 
         User user = userRepository.findById(dto.getUserId())
@@ -158,7 +171,9 @@ public class BookingService {
                 getImageHotel(booking.getRoom().getHotel().getId()),
                 booking.getCreatedAt(),
                 booking.getUpdatedAt(),
-                booking.getVoucherIds()
+                booking.getVoucherIds(),
+                booking.getPaidPrice(),
+                booking.getHotelPaymentType().getPaymentType().getPaymentType().name()
         );
     }
 
