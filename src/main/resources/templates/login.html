@@ -118,6 +118,11 @@
         Bạn đã đăng xuất thành công.
     </div>
 
+    <div th:if="${success}" class="mb-4 p-3 bg-red-100 border border-red-300 text-red-700 rounded-md text-sm text-center">
+        <p th:text="${success}"></p>
+    </div>
+
+
     <!-- Form đăng nhập -->
     <!-- Spring Security mặc định endpoint là /login -->
     <form id="loginForm" th:action="@{/login}" method="post" th:object="${loginRequest}">

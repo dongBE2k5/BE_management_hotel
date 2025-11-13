@@ -50,9 +50,9 @@ public class AuthController {
     }
 
     @PostMapping("/register-employee")
-    public ResponseEntity<?> registerEmployee(@RequestBody RegisterRequest req) {
+    public ResponseEntity<?> registerEmployee(@RequestBody RegisterRequest req,@RequestParam Long hotelId) {
         try {
-            UserResponse created = userService.registerEmployee(req);
+            UserResponse created = userService.registerEmployee(req,hotelId);
             return ResponseEntity.status(HttpStatus.CREATED).body(created);
         } catch (RuntimeException ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
