@@ -24,6 +24,11 @@ public class HotelPaymentTypeController {
         return hotelPaymentTypeService.findAllByHotelId(hotelId);
     }
 
+    @GetMapping("/hotel/{hotelId}/type-of-room/{typeOfRoomId}")
+    public ResponseEntity<ApiResponse> getPaymentTypesByHotelAndTypeOfRoom(@PathVariable Long hotelId, @PathVariable Long typeOfRoomId) {
+        return hotelPaymentTypeService.findAllByHotelIdAndTypeOfRoom(hotelId, typeOfRoomId);
+    }
+
     @PutMapping()
     public ResponseEntity<ApiResponse> update(@RequestBody HotelPaymentTypeRequestDTO dto) {
         return hotelPaymentTypeService.update(dto);

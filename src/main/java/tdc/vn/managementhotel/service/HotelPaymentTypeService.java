@@ -18,10 +18,7 @@ import tdc.vn.managementhotel.repository.PaymentTypeRepository;
 import tdc.vn.managementhotel.repository.TypeOfRoomRepository;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -102,6 +99,42 @@ public class HotelPaymentTypeService {
             item.put("depositPercent", entry.getKey());
             item.put("roomTypeIds", entry.getValue().stream()
                     .map(r -> r.getTypeOfRoom().getId())
+                    .collect(Collectors.toList())
+            );
+
+            result.add(item);
+        }
+
+        return ResponseEntity.ok(
+                new ApiResponse(HttpStatus.OK.value(),
+                        "Lấy danh sách thành công",
+                        result,
+                        LocalDateTime.now())
+        );
+    }
+
+    public ResponseEntity<ApiResponse> findAllByHotelIdAndTypeOfRoom(Long hotelId, Long typeOfRoomId) {
+        List<HotelPaymentType> records = hotelPaymentTypeRepository.findByHotelIdAndTypeOfRoomId( hotelId, typeOfRoomId);
+
+        Map<Double, List<HotelPaymentType>> grouped = records.stream()
+                .collect(Collectors.groupingBy(HotelPaymentType::getDepositPercent));
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (Map.Entry<Double, List<HotelPaymentType>> entry : grouped.entrySet()) {
+            Map<String, Object> item = new HashMap<>();
+            item.put("id", records.get(0).getId());
+            item.put("hotelId", hotelId);
+            item.put("paymentType", records.get(0).getPaymentType().getPaymentType());
+            item.put("depositPercent", entry.getKey());
+            if (records.get(0).getId() != 1) {
+                item.put("roomTypeIds", entry.getValue().stream()
+                        .map(r -> r.getTypeOfRoom().getId())
+                        .collect(Collectors.toList())
+                );
+            }
+            item.put("roomTypeIds", entry.getValue().stream()
+                    .map(r -> Optional.ofNullable(r.getTypeOfRoom())
+                            .map(TypeOfRoom::getId)
+                            .orElse(null))
                     .collect(Collectors.toList())
             );
 
