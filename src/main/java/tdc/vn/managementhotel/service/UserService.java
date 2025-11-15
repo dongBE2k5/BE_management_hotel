@@ -1,5 +1,6 @@
 package tdc.vn.managementhotel.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -28,19 +29,25 @@ import org.springframework.mail.javamail.JavaMailSender;
 import java.util.regex.Pattern;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
-    @Autowired
-    private UserRepository userRepository;
 
-    @Autowired
-    private RoleRepository roleRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private JavaMailSender mailSender;
+    private final RoleRepository roleRepository;
+
+
+    private final PasswordEncoder passwordEncoder;
+
+
+    private final JavaMailSender mailSender;
+
+    private final EmployeeRepository employeeRepository;
+
+    private final EmployeeService employeeService;
+    private final HotelRepository hotelRepository;
 
     private final Map<String, String> otpStorage = new HashMap<>();
     private final Map<String, LocalDateTime> otpExpiry = new HashMap<>();
@@ -55,11 +62,8 @@ public class UserService {
             Pattern.compile("^(?=.{6,}$)(?=.*[A-Z])(?=.*[^A-Za-z0-9])\\S+$");
     private static final Pattern GMAIL_PATTERN =
             Pattern.compile("^[A-Za-z0-9._%+-]+@gmail\\.com$");
-    @Autowired
-    private EmployeeRepository employeeRepository;
-    @Autowired
-    private EmployeeService employeeService;
-    private HotelRepository hotelRepository;
+
+
 
     public UserResponse register(RegisterRequest req) {
         if (req.getFullName() == null || req.getFullName().trim().isEmpty()) {
@@ -132,7 +136,7 @@ public class UserService {
         user.setEmail(req.getEmail());
         user.setFullName(req.getFullName());
         user.setPhone(req.getPhone());
-//        user.setCccd(req.getCccd());
+        user.setCccd(req.getCccd());
         user.setRole(role);
 
 

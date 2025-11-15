@@ -16,7 +16,7 @@ public class RoomItemRequestDTO {
     // Khi thêm 1 item
     private Long itemId;
     private Integer quantity;
-    private BigDecimal price;
+
 
     // Khi thêm nhiều item
     private List<ItemDetail> items;
@@ -28,7 +28,7 @@ public class RoomItemRequestDTO {
         private Long itemId;
         private String itemName;
         private int quantity;
-        private BigDecimal price;
+
     }
 
     // Hàm helper để kiểm tra loại request

@@ -4,7 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import tdc.vn.managementhotel.dto.ItemDTO.ItemRequestDTO;
 import tdc.vn.managementhotel.dto.ItemDTO.ItemResponseDTO;
+import tdc.vn.managementhotel.entity.Hotel;
 import tdc.vn.managementhotel.entity.Item;
+import tdc.vn.managementhotel.repository.HotelRepository;
 import tdc.vn.managementhotel.repository.ItemRepository;
 
 import java.util.List;
@@ -14,6 +16,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ItemService {
     private final ItemRepository itemRepository;
+    private final HotelRepository hotelRepository;
 
     /**
      * Tạo một Item mới
@@ -85,7 +88,10 @@ public class ItemService {
     private ItemResponseDTO mapToResponseDTO(Item item) {
         ItemResponseDTO dto = new ItemResponseDTO();
 
+        dto.setId(item.getId());
         dto.setName(item.getName());
+        dto.setPrice(item.getPrice());
+        dto.setHotelId(item.getHotel().getId());
 
         return dto;
     }
@@ -94,9 +100,12 @@ public class ItemService {
      * Hàm private để tạo một Entity MỚI từ Request DTO
      */
     private Item mapToNewEntity(ItemRequestDTO requestDTO) {
+        Hotel hotel = hotelRepository.findById(requestDTO.getHotelId())
+                .orElseThrow(() -> new RuntimeException("Hotel not found with id: " + requestDTO.getHotelId()));
         Item item = new Item();
         item.setName(requestDTO.getName());
-
+        item.setPrice(requestDTO.getPrice());
+        item.setHotel(hotel);
         return item;
     }
 

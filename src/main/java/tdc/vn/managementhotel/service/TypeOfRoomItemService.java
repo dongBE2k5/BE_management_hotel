@@ -54,6 +54,7 @@ public class TypeOfRoomItemService {
      */
     @Transactional
     public String createOrUpdateRoomItems(RoomItemRequestDTO dto) {
+
         TypeOfRoom typeOfRoom = typeOfRoomRepository.findById(dto.getTypeOfRoomId())
                 .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy loại phòng có ID: " + dto.getTypeOfRoomId()));
 
@@ -62,20 +63,13 @@ public class TypeOfRoomItemService {
                     ? itemRepository.findById(itemDetail.getItemId()).orElse(null)
                     : null;
 
-            // Nếu item chưa tồn tại thì tạo mới
-            if (item == null) {
-                item = new Item();
-                item.setName(itemDetail.getItemName() != null ? itemDetail.getItemName() : "Tiện ích mới");
-                item = itemRepository.save(item);
-            }
-
             // Kiểm tra (typeOfRoom, item) đã tồn tại chưa
             TypeOfRoomItem existing = typeOfRoomItemRepository.findByTypeOfRoomAndItem(typeOfRoom, item)
                     .orElse(null);
 
             if (existing != null) {
                 existing.setQuantity(itemDetail.getQuantity());
-                existing.setPrice(itemDetail.getPrice());
+
                 return existing;
             }
 
@@ -84,7 +78,7 @@ public class TypeOfRoomItemService {
             newEntity.setTypeOfRoom(typeOfRoom);
             newEntity.setItem(item);
             newEntity.setQuantity(itemDetail.getQuantity());
-            newEntity.setPrice(itemDetail.getPrice());
+
 
             // 🧠 Thêm dòng này để gán id tổng hợp
             newEntity.getId().setTypeOfRoomId(typeOfRoom.getId());
@@ -119,7 +113,7 @@ public class TypeOfRoomItemService {
                     .findFirst()
                     .ifPresent(existing -> {
                         existing.setQuantity(itemDetail.getQuantity());
-                        existing.setPrice(itemDetail.getPrice());
+
                     });
         }
 
@@ -140,7 +134,7 @@ public class TypeOfRoomItemService {
                 .itemId(entity.getItem().getId())
                 .itemName(entity.getItem().getName())
                 .quantity(entity.getQuantity())
-                .price(entity.getPrice())
+
                 .build();
     }
 }
