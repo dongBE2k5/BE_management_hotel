@@ -93,8 +93,8 @@ public class HistoryChangeBookingStatusService {
                 booking.getUpdatedAt(),    // 🕒 thêm
                 booking.getVoucherIds(),
                 booking.getPaidPrice(),
-                booking.getHotelPaymentType().getPaymentType().getPaymentType().name()
-
+                booking.getHotelPaymentType().getPaymentType().getPaymentType().name(),
+                booking.getPaymentMethod()
         );
     }
 

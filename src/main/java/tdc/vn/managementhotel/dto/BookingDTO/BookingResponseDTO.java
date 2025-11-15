@@ -9,6 +9,7 @@ import tdc.vn.managementhotel.entity.PaymentTypes;
 import tdc.vn.managementhotel.entity.Room;
 import tdc.vn.managementhotel.entity.User;
 import tdc.vn.managementhotel.enums.BookingStatus;
+import tdc.vn.managementhotel.enums.PaymentMethod;
 import tdc.vn.managementhotel.enums.StatusRoom;
 import tdc.vn.managementhotel.dto.VoucherDTO.VoucherResponseDTO;
 import java.math.BigDecimal;
@@ -33,6 +34,7 @@ public class BookingResponseDTO {
     private String voucherIds;
     private BigDecimal paidPrice;
     private String paymentType;
+    private PaymentMethod paymentMethod;
 
 
 }

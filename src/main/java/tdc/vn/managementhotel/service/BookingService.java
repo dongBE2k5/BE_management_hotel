@@ -126,7 +126,7 @@ public class BookingService {
             booking.setStatus(BookingStatus.CHUA_THANH_TOAN);
         }
         booking.setTotalPrice(dto.getTotalPrice());
-
+        booking.setPaymentMethod(dto.getPaymentMethod());
         User user = userRepository.findById(dto.getUserId())
                 .orElseThrow(() -> new EntityNotFoundException("Location not found"));
         booking.setUser(user);
@@ -179,7 +179,8 @@ public class BookingService {
                 booking.getUpdatedAt(),
                 booking.getVoucherIds(),
                 booking.getPaidPrice(),
-                booking.getHotelPaymentType().getPaymentType().getPaymentType().name()
+                booking.getHotelPaymentType().getPaymentType().getPaymentType().name(),
+                booking.getPaymentMethod()
         );
     }
 

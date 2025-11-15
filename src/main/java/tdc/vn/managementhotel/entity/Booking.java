@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import tdc.vn.managementhotel.enums.BookingStatus;
 import org.hibernate.annotations.UpdateTimestamp;
+import tdc.vn.managementhotel.enums.PaymentMethod;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -47,6 +48,9 @@ public class Booking {
 
     @Enumerated(EnumType.STRING)
     private BookingStatus status;
+
+    @Enumerated(EnumType.STRING)
+    private PaymentMethod paymentMethod;
 
     private BigDecimal totalPrice;
 
