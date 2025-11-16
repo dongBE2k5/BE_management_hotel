@@ -1,11 +1,8 @@
 package tdc.vn.managementhotel.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.catalina.Host;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.data.repository.Repository;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -13,13 +10,16 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import tdc.vn.managementhotel.dto.ApiResponse;
 import tdc.vn.managementhotel.dto.HostHotelDTO.HostHotelResponseDTO;
-import tdc.vn.managementhotel.dto.JwtAuthenticationResponse;
 import tdc.vn.managementhotel.dto.LoginRequest;
 import tdc.vn.managementhotel.dto.RegisterRequest;
+import tdc.vn.managementhotel.entity.Hotel;
 import tdc.vn.managementhotel.enums.HostHotelStatus;
 import tdc.vn.managementhotel.model.CustomUserDetails;
+import tdc.vn.managementhotel.repository.HotelRepository;
 import tdc.vn.managementhotel.service.HostHotelService;
+import tdc.vn.managementhotel.service.HotelService;
 import tdc.vn.managementhotel.service.UserService;
 import tdc.vn.managementhotel.util.JwtUtil;
 
@@ -32,6 +32,8 @@ public class AdminWebController {
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
     private final HostHotelService hostHotelService;
+    private final HotelRepository hotelRepository;
+    private final HotelService hotelService;
 
     @GetMapping("login")
     public String login(Model model) {
@@ -67,13 +69,26 @@ public class AdminWebController {
         // Lấy danh sách host từ service
         List<HostHotelResponseDTO> hostList = hostHotelService.getAll();
 
+
         // Thêm các thuộc tính cho Thymeleaf
         model.addAttribute("hosts", hostList);
 
 
         // Trả về tên của tệp HTML (không có .html)
-        return "admin-dashboard";
+        return "admin/admin-dashboard";
     }
+
+    @GetMapping("/hosts/{idUser}/hotelList")
+    public String listHotel(Model model, @PathVariable Long idUser) {
+
+        List<Hotel> hotels = hotelRepository.findByUserId(idUser);
+        model.addAttribute("hotels", hotels);
+        model.addAttribute("idUser", idUser);
+
+        // Rất quan trọng: Trả về tên của file fragment, không phải "admin-dashboard"
+        return "admin/hotel-list-fragment"; // Ví dụ: 'templates/admin/hotel-list-fragment.html'
+    }
+
     @PutMapping("/hosts/{id}")
     public String updateHostStatus(@PathVariable Long id, @RequestParam String status, RedirectAttributes redirectAttrs) {
         HostHotelStatus hotelStatus = HostHotelStatus.valueOf(status);
@@ -87,6 +102,7 @@ public class AdminWebController {
         try {
             userService.registerHost(registerRequest);
             model.addAttribute("success", "Đăng ký thành công!");
+            model.addAttribute("loginRequest", new LoginRequest());
             return "login"; // chuyển sang trang login
         } catch (RuntimeException ex) {
             model.addAttribute("error", ex.getMessage());

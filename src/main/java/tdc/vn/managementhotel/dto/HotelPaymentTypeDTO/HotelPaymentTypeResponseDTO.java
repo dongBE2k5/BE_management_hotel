@@ -1,4 +1,4 @@
-package tdc.vn.managementhotel.dto.HotelPaymentType;
+package tdc.vn.managementhotel.dto.HotelPaymentTypeDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,4 +13,5 @@ public class HotelPaymentTypeResponseDTO {
     private Long hotelId;
     private PaymentType paymentType;
     private Double depositPercent;
+    private Long typeOfRoomId;
 }

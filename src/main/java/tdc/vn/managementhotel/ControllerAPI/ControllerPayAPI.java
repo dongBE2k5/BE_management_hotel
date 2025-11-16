@@ -3,8 +3,10 @@ package tdc.vn.managementhotel.controllerAPI;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +22,11 @@ import tdc.vn.managementhotel.config.ZaloPayConfig;
 import tdc.vn.managementhotel.dto.ApiResponse;
 import tdc.vn.managementhotel.dto.BookingDTO.ChangeBookingStatusRequestDTO;
 import tdc.vn.managementhotel.dto.PaymentDTO.PaymentResponseDTO;
+import tdc.vn.managementhotel.entity.HostHotel;
+import tdc.vn.managementhotel.entity.Hotel;
 import tdc.vn.managementhotel.enums.BookingStatus;
+import tdc.vn.managementhotel.repository.HostHotelRepository;
+import tdc.vn.managementhotel.repository.HotelRepository;
 import tdc.vn.managementhotel.service.BookingService;
 import tdc.vn.managementhotel.service.PaymentService;
 import tdc.vn.managementhotel.service.VNPayService;
@@ -44,6 +50,8 @@ public class ControllerPayAPI {
     private final BookingService bookingService;
 
     private final SimpMessagingTemplate messagingTemplate;
+    private final HotelRepository hotelRepository;
+    private final HostHotelRepository hostHotelRepository;
 
 
     @PostMapping("/zalo")
@@ -70,7 +78,7 @@ public class ControllerPayAPI {
                                        @RequestParam("ip") String ip, HttpServletRequest request) {
 	    String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
 		String vnpayUrl = vnPayService.createOrder(orderTotal, orderInfo, baseUrl);
-        PaymentResponseDTO paymentResponseDTO = new PaymentResponseDTO(null ,method,(long)orderTotal,"Wait for payment",Long.parseLong(orderInfo),null);
+        PaymentResponseDTO paymentResponseDTO = new PaymentResponseDTO(null ,method.toUpperCase(Locale.ROOT),(long)orderTotal,"Wait for payment",Long.parseLong(orderInfo),null);
         paymentService.createPay(paymentResponseDTO);
 
         globalStore.setValue(String.valueOf(orderInfo),ip);
@@ -141,5 +149,23 @@ public class ControllerPayAPI {
         paymentService.createPay(paymentResponseDTO);
 
         return ResponseEntity.ok(ApiResponse.success("Thanh toán thành công",paymentResponseDTO));
+    }
+
+    @PostMapping("/createpayqr")
+    public ResponseEntity<ApiResponse<String>> qrpayment(@RequestParam("amount") int orderTotal,
+                                                                         @RequestParam("orderInfo") String orderInfo,
+                                                                         @RequestParam("method") String method,
+                                                                     @RequestParam("hotelId") Long hotelId){
+        Hotel hotel= hotelRepository.findById(hotelId).orElseThrow(()-> new EntityNotFoundException("Hotel not found"));
+        HostHotel hostHotel= hostHotelRepository.findByUserId(hotel.getUser().getId()).orElseThrow(()-> new EntityNotFoundException("Host hotel not found"));
+        String url = "https://img.vietqr.io/image/"+hostHotel.getNganHang()+"-"+hostHotel.getStk()+"-compact2.png?amount="+orderTotal+"&addInfo="+orderInfo+"&accountName="+hostHotel.getUser().getFullName();
+
+//
+//        PaymentResponseDTO paymentResponseDTO = new PaymentResponseDTO(null ,method,(long)orderTotal,"success",Long.parseLong(orderInfo),null);
+//        paymentService.createPay(paymentResponseDTO);
+
+
+
+        return ResponseEntity.ok(ApiResponse.success("Thanh toán thành công",url));
     }
 }

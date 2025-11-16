@@ -1,10 +1,12 @@
 package tdc.vn.managementhotel.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -20,6 +22,13 @@ public class Item {
     private Long id;
 
     private String name;
+
+    private BigDecimal price;
+
+    @ManyToOne(fetch =  FetchType.LAZY,cascade = CascadeType.ALL, optional = false)
+    @JoinColumn(name = "hotel_id")
+    @JsonIgnore
+    private Hotel hotel;
 
     @OneToMany(
             mappedBy = "item",

@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import tdc.vn.managementhotel.enums.BookingStatus;
 import org.hibernate.annotations.UpdateTimestamp;
+import tdc.vn.managementhotel.enums.PaymentMethod;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -42,13 +43,18 @@ public class Booking {
     private LocalDate checkOutDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "payment_type_id")
-    private HotelPaymentType paymentType;
+    @JoinColumn(name = "hotel_payment_type_id")
+    private HotelPaymentType hotelPaymentType;
 
     @Enumerated(EnumType.STRING)
     private BookingStatus status;
 
+    @Enumerated(EnumType.STRING)
+    private PaymentMethod paymentMethod;
+
     private BigDecimal totalPrice;
+
+    private BigDecimal paidPrice;
 
     // 🕒 Thời điểm tạo booking (tự động lưu)
     @Column(updatable = false)

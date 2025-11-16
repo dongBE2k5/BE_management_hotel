@@ -21,11 +21,15 @@ public class HotelPaymentType {
     @JoinColumn(name = "hotel_id")
     private Hotel hotel;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "payment_type", length = 20)
-    private PaymentType paymentType;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "payment_type_id")
+    private PaymentTypes paymentType;
 
     @Column(name = "deposit_percent")
     private Double depositPercent; // ví dụ: 0.3 = 30% cọc
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "type_room_id")
+    private TypeOfRoom typeOfRoom;
 
 }

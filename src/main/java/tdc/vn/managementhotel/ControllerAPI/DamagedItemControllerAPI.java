@@ -89,5 +89,11 @@ public class DamagedItemControllerAPI {
         List<DamagedItemResponseDTO> result = damagedItemService.getByRequest(requestID);
         return ResponseEntity.ok(ApiResponse.success("Danh sách vật phẩm hư hỏng trong phòng " + requestID, result));
     }
+    @GetMapping("/booking/{bookingID}")
+    public ResponseEntity<ApiResponse<List<DamagedItemResponseDTO>>> getByBooking(@PathVariable Long bookingID) {
+
+        List<DamagedItemResponseDTO> result = damagedItemService.getByBooking(bookingID);
+        return ResponseEntity.ok(ApiResponse.success("Danh sách vật phẩm hư hỏng trong phòng booking" , result));
+    }
 }
 

@@ -22,6 +22,32 @@
     <i class="bi bi-check-circle-fill"></i>
     <span id="toast-message">Nội dung thông báo ở đây</span>
 </div>
+
+<div id="image-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/75 p-4">
+    <div id="modal-bg-close" class="absolute inset-0"></div>
+    <div class="relative bg-white p-2 rounded-lg shadow-lg z-10">
+        <img id="modal-image" src="" alt="Chi tiết ảnh" class="object-contain max-h-[90vh] max-w-[90vw]">
+    </div>
+    <button id="modal-close-btn" class="absolute top-4 right-4 text-white text-3xl z-20 hover:opacity-75">
+        <i class="bi bi-x-lg"></i>
+    </button>
+</div>
+
+<div id="hotel-list-modal" class="hidden fixed inset-0 z-40 flex items-center justify-center bg-black/75 p-4">
+    <div class="hotel-modal-bg-close absolute inset-0"></div>
+
+    <div class="relative bg-white p-6 rounded-lg shadow-lg z-10 w-full max-w-5xl max-h-[90vh] flex flex-col">
+        <div class="flex justify-between items-center border-b pb-3 mb-4">
+            <h4 class="text-2xl font-semibold">Danh sách khách sạn</h4>
+            <button id="hotel-modal-close-btn" class="text-gray-500 hover:text-gray-800 text-3xl z-20">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        <div id="hotel-modal-content" class="overflow-y-auto">
+            <p class="text-center text-gray-500">Đang tải...</p>
+        </div>
+    </div>
+</div>
 <div class="flex">
     <div class="w-64 min-h-screen bg-gradient-to-b from-blue-800 to-blue-900 text-white p-4 fixed">
         <h2 class="text-2xl font-bold text-center py-6 mb-4">Admin Panel</h2>
@@ -70,15 +96,17 @@
                         <td class="px-6 py-4 text-sm text-gray-700" th:text="${host.stk}"></td>
 
                         <td>
-                            <img th:src="@{'/uploads/' + ${host.cccdMatTruoc}}" alt="CCCD Trước" class="w-16 h-10 object-cover rounded-md shadow-sm">
+                            <img th:src="@{'/uploads/' + ${host.cccdMatTruoc}}" alt="CCCD Trước"
+                                 class="w-16 h-10 object-cover rounded-md shadow-sm hinh-anh-chi-tiet cursor-pointer transition-transform hover:scale-110">
                         </td>
                         <td>
-                            <img th:src="@{'/uploads/' + ${host.cccdMatSau}}" alt="CCCD Sau" class="w-16 h-10 object-cover rounded-md shadow-sm">
+                            <img th:src="@{'/uploads/' + ${host.cccdMatSau}}" alt="CCCD Sau"
+                                 class="w-16 h-10 object-cover rounded-md shadow-sm hinh-anh-chi-tiet cursor-pointer transition-transform hover:scale-110">
                         </td>
                         <td>
-                            <img th:src="@{'/uploads/' + ${host.giayPhepKinhDoanh}}" alt="Giấy phép KD" class="w-16 h-10 object-cover rounded-md shadow-sm">
+                            <img th:src="@{'/uploads/' + ${host.giayPhepKinhDoanh}}" alt="Giấy phép KD"
+                                 class="w-16 h-10 object-cover rounded-md shadow-sm hinh-anh-chi-tiet cursor-pointer transition-transform hover:scale-110">
                         </td>
-
                         <td class="px-6 py-4">
                             <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full"
                                   th:classappend="
@@ -88,7 +116,6 @@
                                   th:text="${host.status}">
                             </span>
                         </td>
-
                         <td class="px-6 py-4 text-sm font-medium" th:switch="${host.status}">
                             <div class="flex items-center gap-2">
                                 <form th:case="'PENDING'"
@@ -101,7 +128,7 @@
                                     </button>
                                 </form>
 
-                                <div th:case="'VERIFIED'" class="flex gap-2">
+                                <div th:case="'VERIFIED'" class="flex items-center gap-2">
                                     <form th:action="@{/hosts/{id}(id=${host.userId})}" method="POST" class="inline">
                                         <input type="hidden" name="_method" value="PUT" />
                                         <input type="hidden" name="status" value="REJECTED" />
@@ -116,6 +143,19 @@
                                             Vô hiệu hóa
                                         </button>
                                     </form>
+
+                                    <a th:href="@{/admin/hosts/{id}/hotels/new(id=${host.userId})}"
+                                       class="bg-blue-500 hover:bg-blue-600 text-white text-xs font-bold py-1 px-3 rounded-full transition-colors cursor-pointer"
+                                       title="Thêm khách sạn cho chủ này">
+                                        Thêm KS
+                                    </a>
+
+                                    <button type="button"
+                                            th:data-userid="${host.userId}"
+                                            class="btn-view-hotels bg-teal-500 hover:bg-teal-600 text-white text-xs font-bold py-1 px-3 rounded-full transition-colors cursor-pointer"
+                                            title="Xem danh sách khách sạn của chủ này">
+                                        Xem KS
+                                    </button>
                                 </div>
 
                                 <form th:case="*"
@@ -146,35 +186,98 @@
 <script>
     document.addEventListener("DOMContentLoaded",()=>{
 
-        // === THÊM MỚI 2: Biến timer và Hàm hiển thị Toast ===
-        let toastTimer; // Biến để giữ timer, giúp reset nếu có toast mới
-
+        let toastTimer;
         function showToast(message) {
             const toast = document.getElementById("toast-notification");
             const toastMessage = document.getElementById("toast-message");
-
             if (!toast || !toastMessage) return;
-
-            // 1. Đặt nội dung
             toastMessage.innerText = message;
-
-            // 2. Hiện toast
             toast.classList.remove("hidden");
-
-            // 3. Xóa timer cũ (nếu đang có 1 toast khác)
             if (toastTimer) {
                 clearTimeout(toastTimer);
             }
-
-            // 4. Tự động ẩn sau 3 giây
             toastTimer = setTimeout(() => {
                 toast.classList.add("hidden");
-            }, 3000); // 3000ms = 3 giây
+            }, 3000);
         }
-        // === KẾT THÚC THÊM MỚI 2 ===
 
 
-        // --- Code WebSocket của bạn ---
+        // === LOGIC CHO IMAGE MODAL ===
+        const modal = document.getElementById("image-modal");
+        const modalImage = document.getElementById("modal-image");
+        const closeModalBtn = document.getElementById("modal-close-btn");
+        const modalBgClose = document.getElementById("modal-bg-close");
+
+        if (modal && modalImage && closeModalBtn && modalBgClose) {
+            document.body.addEventListener("click", function(event) {
+                if (event.target.classList.contains("hinh-anh-chi-tiet")) {
+                    const src = event.target.getAttribute("src");
+                    modalImage.setAttribute("src", src);
+                    modal.classList.remove("hidden");
+                }
+            });
+            closeModalBtn.addEventListener("click", () => {
+                modal.classList.add("hidden");
+            });
+            modalBgClose.addEventListener("click", () => {
+                modal.classList.add("hidden");
+            });
+        }
+
+        // ===== THÊM MỚI 3: LOGIC CHO HOTEL LIST MODAL =====
+        const hotelModal = document.getElementById("hotel-list-modal");
+        const hotelModalCloseBtn = document.getElementById("hotel-modal-close-btn");
+        const hotelModalContent = document.getElementById("hotel-modal-content");
+        const hotelModalBgClose = document.querySelector(".hotel-modal-bg-close"); // Lấy theo class
+
+        if (hotelModal && hotelModalCloseBtn && hotelModalContent && hotelModalBgClose) {
+
+            // 1. Mở modal (dùng event delegation cho các nút 'Xem KS')
+            document.body.addEventListener("click", async function(event) {
+                const targetButton = event.target.closest(".btn-view-hotels");
+
+                if (targetButton) {
+                    const userId = targetButton.dataset.userid;
+                    if (!userId) return;
+
+                    // Hiển thị modal và trạng thái loading
+                    hotelModalContent.innerHTML = `<p class="text-center text-gray-500">Đang tải...</p>`;
+                    hotelModal.classList.remove("hidden");
+
+                    try {
+                        // 2. Fetch dữ liệu fragment từ controller
+                        const response = await fetch(`/hosts/${userId}/hotelList`);
+                        if (!response.ok) {
+                            throw new Error("Không thể tải danh sách khách sạn. Mã lỗi: " + response.status);
+                        }
+                        const htmlFragment = await response.text();
+
+                        // 3. Hiển thị fragment vào modal
+                        hotelModalContent.innerHTML = htmlFragment;
+
+                    } catch (error) {
+                        console.error("Lỗi fetch modal:", error);
+                        hotelModalContent.innerHTML = `<p class="text-center text-red-500">${error.message}</p>`;
+                    }
+                }
+            });
+
+            // 4. Đóng modal (Nút X)
+            hotelModalCloseBtn.addEventListener("click", () => {
+                hotelModal.classList.add("hidden");
+                hotelModalContent.innerHTML = ""; // Xóa nội dung cũ để lần sau load lại
+            });
+
+            // 5. Đóng modal (Click nền)
+            hotelModalBgClose.addEventListener("click", () => {
+                hotelModal.classList.add("hidden");
+                hotelModalContent.innerHTML = ""; // Xóa nội dung cũ
+            });
+        }
+        // ===== KẾT THÚC THÊM MỚI 3 =====
+
+
+        // --- Code WebSocket (Giữ nguyên) ---
         const  socket= new SockJS("/ws");
         const  stompClient=Stomp.over(socket);
 
@@ -182,25 +285,18 @@
             console.log("connected",frame)
             stompClient.subscribe('/topic/hosts',(message)=>{
                 const payload = JSON.parse(message.body);
-
-                // === THÊM MỚI 3: Gọi hàm showToast ===
-                // Sửa lỗi: payload.message() không đúng, và logic nên ở đây
                 if (payload.type === "NEWHOST"){
-                    // Lấy message từ payload, hoặc dùng 1 message mặc định
                     const notificationMessage = payload.message || `Chủ khách sạn ${payload.data.cccd} vừa đăng ký.`;
                     showToast(notificationMessage);
                 }
-                // === KẾT THÚC THÊM MỚI 3 ===
-
-                // Cập nhật bảng (vẫn giữ nguyên)
                 addOrUpdateHostRow(payload.data)
             })
         })
+
         function addOrUpdateHostRow(host) {
             const tableBody = document.querySelector("table tbody");
             if (!tableBody) return;
 
-            // Xóa dòng "Không có dữ liệu" nếu nó đang tồn tại
             const emptyRow = tableBody.querySelector("td[colspan='9']");
             if (emptyRow) {
                 emptyRow.parentElement.remove();
@@ -226,9 +322,9 @@
                 <td class="px-6 py-4 text-sm text-gray-700">${host.cccd}</td>
                 <td class="px-6 py-4 text-sm text-gray-700">${host.nganHang}</td>
                 <td class="px-6 py-4 text-sm text-gray-700">${host.stk}</td>
-                <td class="px-6 py-4"><img src="/uploads/${host.cccdMatTruoc}" class="w-16 h-10 object-cover rounded-md shadow-sm"></td>
-                <td class="px-6 py-4"><img src="/uploads/${host.cccdMatSau}" class="w-16 h-10 object-cover rounded-md shadow-sm"></td>
-                <td class="px-6 py-4"><img src="/uploads/${host.giayPhepKinhDoanh}" class="w-16 h-10 object-cover rounded-md shadow-sm"></td>
+                <td class="px-6 py-4"><img src="/uploads/${host.cccdMatTruoc}" class="w-16 h-10 object-cover rounded-md shadow-sm hinh-anh-chi-tiet cursor-pointer"></td>
+                <td class="px-6 py-4"><img src="/uploads/${host.cccdMatSau}" class="w-16 h-10 object-cover rounded-md shadow-sm hinh-anh-chi-tiet cursor-pointer"></td>
+                <td class="px-6 py-4"><img src="/uploads/${host.giayPhepKinhDoanh}" class="w-16 h-10 object-cover rounded-md shadow-sm hinh-anh-chi-tiet cursor-pointer"></td>
                 <td class="px-6 py-4">
                     <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClass(host.status)}">
                         ${host.status}
@@ -244,7 +340,6 @@
                     </form>
                 </td>
             `;
-                // Thêm vào đầu bảng
                 tableBody.prepend(newRow);
             }
         }

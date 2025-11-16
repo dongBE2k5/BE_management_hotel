@@ -30,7 +30,6 @@ public class TypeOfRoomItem {
 
     private int quantity;
 
-    private BigDecimal price;
 
 
 

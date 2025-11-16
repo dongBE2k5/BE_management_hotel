@@ -1,6 +1,7 @@
 package tdc.vn.managementhotel.ControllerAPI;
 
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,16 +30,17 @@ import java.util.Optional;
 
 @CrossOrigin(originPatterns = "*", allowedHeaders = "*")
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
-    @Autowired private JwtUtil jwtUtil;
-    @Autowired private UserService userService;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final AuthenticationManager authenticationManager;
+private final JwtUtil jwtUtil;
+   private final UserService userService;
+
+
+    private final UserRepository userRepository;
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody RegisterRequest req) {
         try {
@@ -50,9 +52,9 @@ public class AuthController {
     }
 
     @PostMapping("/register-employee")
-    public ResponseEntity<?> registerEmployee(@RequestBody RegisterRequest req) {
+    public ResponseEntity<?> registerEmployee(@RequestBody RegisterRequest req,@RequestParam Long hotelId) {
         try {
-            UserResponse created = userService.registerEmployee(req);
+            UserResponse created = userService.registerEmployee(req,hotelId);
             return ResponseEntity.status(HttpStatus.CREATED).body(created);
         } catch (RuntimeException ex) {
             return ResponseEntity.badRequest().body(ex.getMessage());
