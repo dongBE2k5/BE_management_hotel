@@ -161,8 +161,8 @@ public class ControllerPayAPI {
         String url = "https://img.vietqr.io/image/"+hostHotel.getNganHang()+"-"+hostHotel.getStk()+"-compact2.png?amount="+orderTotal+"&addInfo="+orderInfo+"&accountName="+hostHotel.getUser().getFullName();
 
 //
-//        PaymentResponseDTO paymentResponseDTO = new PaymentResponseDTO(null ,method,(long)orderTotal,"success",Long.parseLong(orderInfo),null);
-//        paymentService.createPay(paymentResponseDTO);
+        PaymentResponseDTO paymentResponseDTO = new PaymentResponseDTO(null ,method,(long)orderTotal,"Wait for payment",Long.parseLong(orderInfo),null);
+        paymentService.createPay(paymentResponseDTO);
 
 
 
