@@ -43,6 +43,22 @@ public class TypeOfRoomItemControllerAPI {
             return ResponseEntity.ok(ApiResponse.success("Lấy danh sách tiện ích theo room thành công", result));
     }
 
+
+    @GetMapping("/type/{typeOfRoomId}/{hotelId}")
+    public ResponseEntity<ApiResponse<List<RoomItemResponseDTO>>> getItemsByTypeOfRoomId(@PathVariable Long typeOfRoomId,@PathVariable Long hotelId) {
+
+        List<RoomItemResponseDTO> result = typeOfRoomItemService.getItemsByHotel(typeOfRoomId,hotelId);
+        return ResponseEntity.ok(ApiResponse.success("Lấy danh sách tiện ích theo room thành công", result));
+    }
+
+
+    @GetMapping("/hotel/{hotelId}")
+    public ResponseEntity<ApiResponse<List<RoomItemResponseDTO>>> getItemsByTypeOfRoomOfHotel(@PathVariable Long hotelId) {
+
+        List<RoomItemResponseDTO> result = typeOfRoomItemService.getItemsByHotelId(hotelId);
+        return ResponseEntity.ok(ApiResponse.success("Lấy danh sách tiện ích theo room thành công", result));
+    }
+
     /**
      * 🔍 Lấy danh sách tiện ích theo roomId (phòng cụ thể)
      */

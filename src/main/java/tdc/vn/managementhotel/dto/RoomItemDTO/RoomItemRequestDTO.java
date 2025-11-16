@@ -26,7 +26,6 @@ public class RoomItemRequestDTO {
     @NoArgsConstructor
     public static class ItemDetail {
         private Long itemId;
-        private String itemName;
         private int quantity;
 
     }

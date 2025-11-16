@@ -6,14 +6,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tdc.vn.managementhotel.dto.RoomItemDTO.RoomItemRequestDTO;
 import tdc.vn.managementhotel.dto.RoomItemDTO.RoomItemResponseDTO;
-import tdc.vn.managementhotel.entity.Item;
-import tdc.vn.managementhotel.entity.Room;
-import tdc.vn.managementhotel.entity.TypeOfRoom;
-import tdc.vn.managementhotel.entity.TypeOfRoomItem;
-import tdc.vn.managementhotel.repository.ItemRepository;
-import tdc.vn.managementhotel.repository.RoomRepository;
-import tdc.vn.managementhotel.repository.TypeOfRoomItemRepository;
-import tdc.vn.managementhotel.repository.TypeOfRoomRepository;
+import tdc.vn.managementhotel.entity.*;
+import tdc.vn.managementhotel.repository.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,6 +20,7 @@ public class TypeOfRoomItemService {
     private final ItemRepository itemRepository;
     private final TypeOfRoomItemRepository typeOfRoomItemRepository;
     private  final RoomRepository roomRepository;
+    private final HotelRepository hotelRepository;
 
 
     public List<RoomItemResponseDTO> getItemByRoomId(Long roomId){
@@ -44,6 +39,42 @@ public class TypeOfRoomItemService {
                 .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy loại phòng có ID: " + typeOfRoomId));
 
         return typeOfRoomItemRepository.findByTypeOfRoom(typeOfRoom)
+                .stream()
+                .map(this::mapJoinEntityToResponseDTO)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Lấy danh sách tiện ích theo loại phòng
+     */
+    public List<RoomItemResponseDTO> getItemsByHotel(Long typeOfRoomId,Long hotelId) {
+        Hotel hotel = hotelRepository.findById(hotelId)
+                .orElseThrow(()-> new EntityNotFoundException("Hotel not found"));
+        List<Item> items= itemRepository.findByHotel(hotel)
+                .stream()
+                .toList();
+        TypeOfRoom typeOfRoom = typeOfRoomRepository.findById(typeOfRoomId)
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy loại phòng có ID: " + typeOfRoomId));
+
+        return typeOfRoomItemRepository.findByTypeOfRoomAndItemIn(typeOfRoom,items)
+                .stream()
+                .map(this::mapJoinEntityToResponseDTO)
+                .collect(Collectors.toList());
+    }
+
+
+    /**
+     * Lấy danh sách tiện ích theo loại phòng
+     */
+    public List<RoomItemResponseDTO> getItemsByHotelId(Long hotelId) {
+        Hotel hotel = hotelRepository.findById(hotelId)
+                .orElseThrow(()-> new EntityNotFoundException("Hotel not found"));
+        List<Item> items= itemRepository.findByHotel(hotel)
+                .stream()
+                .toList();
+
+
+        return typeOfRoomItemRepository.findByItemIn(items)
                 .stream()
                 .map(this::mapJoinEntityToResponseDTO)
                 .collect(Collectors.toList());

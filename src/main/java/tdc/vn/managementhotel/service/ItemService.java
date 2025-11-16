@@ -52,6 +52,18 @@ public class ItemService {
     }
 
     /**
+     * Lấy tất cả các Item by hotelId
+     */
+    public List<ItemResponseDTO> getAllItemsByHotel(Long hotelId) {
+        Hotel hotel = hotelRepository.findById(hotelId)
+                .orElseThrow(() -> new RuntimeException("Hotel not found with id: " + hotelId));
+        return itemRepository.findByHotel(hotel)
+                .stream()
+                .map(this::mapToResponseDTO)
+                .collect(Collectors.toList());
+    }
+
+    /**
      * Cập nhật một Item
      */
     public ItemResponseDTO updateItem(Long id, ItemRequestDTO requestDTO) {
