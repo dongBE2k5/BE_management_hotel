@@ -136,6 +136,25 @@ private final JwtUtil jwtUtil;
     }
 
 
+    @PostMapping("/send-otp-register")
+    public ResponseEntity<?> sendOtpRegister(@RequestBody Map<String, String> body) {
+        String email = body.get("email");
+        userService.sendOtpForRegister(email);
+        return ResponseEntity.ok("OTP đăng ký đã gửi đến email.");
+    }
+    @PostMapping("/verify-otp-register")
+    public ResponseEntity<?> verifyOtpRegister(@RequestBody Map<String, String> body) {
+        String email = body.get("email");
+        String otp = body.get("otp");
+
+        boolean ok = userService.verifyOtp(email, otp);
+
+        if (!ok) {
+            return ResponseEntity.badRequest().body("OTP không hợp lệ hoặc đã hết hạn.");
+        }
+
+        return ResponseEntity.ok("Xác minh email thành công!");
+    }
 
     @PostMapping("/send-otp")
     public ResponseEntity<?> sendOtp(@RequestBody Map<String, String> body) {
