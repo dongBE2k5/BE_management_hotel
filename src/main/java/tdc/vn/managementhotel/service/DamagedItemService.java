@@ -138,14 +138,15 @@ public class DamagedItemService {
 
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy booking: " + bookingId));
-        return damagedItemRepository.findByBooking(booking)
+        return damagedItemRepository.findByBookingId(booking.getId())
                 .stream().map(this::mapToResponse)
                 .collect(Collectors.toList());
     }
 
     private DamagedItemResponseDTO mapToResponse(DamagedItem entity) {
-        TypeOfRoomItem getprice =typeOfRoomItemRepository.findByItemId(entity.getItem().getId())
-                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy request: " + entity.getItem().getId()));
+
+//        TypeOfRoomItem getprice =typeOfRoomItemRepository.findByTypeOfRoomAndItem(entity.getRoom().getTypeOfRoom(),entity.getItem())
+//                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy request: " + entity.getItem().getId()));
 
 
         return DamagedItemResponseDTO.builder()
@@ -160,7 +161,7 @@ public class DamagedItemService {
                 .image(entity.getImage())
                 .reportedBy(entity.getEmployee().getUser().getFullName())
                 .reportedAt(entity.getReportedAt())
-                .price(getprice.getPrice())
+                .price(entity.getItem().getPrice())
                 .bookingId(entity.getBooking().getId())
                 .build();
     }

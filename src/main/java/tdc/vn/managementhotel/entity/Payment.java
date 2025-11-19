@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
+import tdc.vn.managementhotel.enums.PaymentMethod;
 
 @Entity
 @Data
@@ -18,7 +19,8 @@ public class Payment {
     private Long id;
 
     @Nullable
-    private String method;
+    @Enumerated(EnumType.STRING)
+    private PaymentMethod method;
 
     private Long total;
     private String status;

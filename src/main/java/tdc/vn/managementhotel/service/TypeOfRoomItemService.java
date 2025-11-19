@@ -6,14 +6,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tdc.vn.managementhotel.dto.RoomItemDTO.RoomItemRequestDTO;
 import tdc.vn.managementhotel.dto.RoomItemDTO.RoomItemResponseDTO;
-import tdc.vn.managementhotel.entity.Item;
-import tdc.vn.managementhotel.entity.Room;
-import tdc.vn.managementhotel.entity.TypeOfRoom;
-import tdc.vn.managementhotel.entity.TypeOfRoomItem;
-import tdc.vn.managementhotel.repository.ItemRepository;
-import tdc.vn.managementhotel.repository.RoomRepository;
-import tdc.vn.managementhotel.repository.TypeOfRoomItemRepository;
-import tdc.vn.managementhotel.repository.TypeOfRoomRepository;
+import tdc.vn.managementhotel.entity.*;
+import tdc.vn.managementhotel.repository.*;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,6 +20,7 @@ public class TypeOfRoomItemService {
     private final ItemRepository itemRepository;
     private final TypeOfRoomItemRepository typeOfRoomItemRepository;
     private  final RoomRepository roomRepository;
+    private final HotelRepository hotelRepository;
 
 
     public List<RoomItemResponseDTO> getItemByRoomId(Long roomId){
@@ -50,10 +45,47 @@ public class TypeOfRoomItemService {
     }
 
     /**
+     * Lấy danh sách tiện ích theo loại phòng
+     */
+    public List<RoomItemResponseDTO> getItemsByHotel(Long typeOfRoomId,Long hotelId) {
+        Hotel hotel = hotelRepository.findById(hotelId)
+                .orElseThrow(()-> new EntityNotFoundException("Hotel not found"));
+        List<Item> items= itemRepository.findByHotel(hotel)
+                .stream()
+                .toList();
+        TypeOfRoom typeOfRoom = typeOfRoomRepository.findById(typeOfRoomId)
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy loại phòng có ID: " + typeOfRoomId));
+
+        return typeOfRoomItemRepository.findByTypeOfRoomAndItemIn(typeOfRoom,items)
+                .stream()
+                .map(this::mapJoinEntityToResponseDTO)
+                .collect(Collectors.toList());
+    }
+
+
+    /**
+     * Lấy danh sách tiện ích theo loại phòng
+     */
+    public List<RoomItemResponseDTO> getItemsByHotelId(Long hotelId) {
+        Hotel hotel = hotelRepository.findById(hotelId)
+                .orElseThrow(()-> new EntityNotFoundException("Hotel not found"));
+        List<Item> items= itemRepository.findByHotel(hotel)
+                .stream()
+                .toList();
+
+
+        return typeOfRoomItemRepository.findByItemIn(items)
+                .stream()
+                .map(this::mapJoinEntityToResponseDTO)
+                .collect(Collectors.toList());
+    }
+
+    /**
      * Tạo mới hoặc cập nhật danh sách tiện ích cho loại phòng
      */
     @Transactional
     public String createOrUpdateRoomItems(RoomItemRequestDTO dto) {
+
         TypeOfRoom typeOfRoom = typeOfRoomRepository.findById(dto.getTypeOfRoomId())
                 .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy loại phòng có ID: " + dto.getTypeOfRoomId()));
 
@@ -62,20 +94,13 @@ public class TypeOfRoomItemService {
                     ? itemRepository.findById(itemDetail.getItemId()).orElse(null)
                     : null;
 
-            // Nếu item chưa tồn tại thì tạo mới
-            if (item == null) {
-                item = new Item();
-                item.setName(itemDetail.getItemName() != null ? itemDetail.getItemName() : "Tiện ích mới");
-                item = itemRepository.save(item);
-            }
-
             // Kiểm tra (typeOfRoom, item) đã tồn tại chưa
             TypeOfRoomItem existing = typeOfRoomItemRepository.findByTypeOfRoomAndItem(typeOfRoom, item)
                     .orElse(null);
 
             if (existing != null) {
                 existing.setQuantity(itemDetail.getQuantity());
-                existing.setPrice(itemDetail.getPrice());
+
                 return existing;
             }
 
@@ -84,7 +109,7 @@ public class TypeOfRoomItemService {
             newEntity.setTypeOfRoom(typeOfRoom);
             newEntity.setItem(item);
             newEntity.setQuantity(itemDetail.getQuantity());
-            newEntity.setPrice(itemDetail.getPrice());
+
 
             // 🧠 Thêm dòng này để gán id tổng hợp
             newEntity.getId().setTypeOfRoomId(typeOfRoom.getId());
@@ -119,7 +144,7 @@ public class TypeOfRoomItemService {
                     .findFirst()
                     .ifPresent(existing -> {
                         existing.setQuantity(itemDetail.getQuantity());
-                        existing.setPrice(itemDetail.getPrice());
+
                     });
         }
 
@@ -140,7 +165,7 @@ public class TypeOfRoomItemService {
                 .itemId(entity.getItem().getId())
                 .itemName(entity.getItem().getName())
                 .quantity(entity.getQuantity())
-                .price(entity.getPrice())
+
                 .build();
     }
 }

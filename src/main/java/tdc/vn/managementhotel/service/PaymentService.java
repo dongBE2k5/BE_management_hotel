@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import tdc.vn.managementhotel.dto.PaymentDTO.PaymentResponseDTO;
 import tdc.vn.managementhotel.entity.Payment;
+import tdc.vn.managementhotel.enums.PaymentMethod;
 import tdc.vn.managementhotel.repository.PaymentRepository;
 
 import java.util.List;
@@ -20,7 +21,7 @@ public class PaymentService {
     public PaymentResponseDTO createPay(PaymentResponseDTO dto) {
         Payment payment = new Payment(
                 null, // id tự động
-                dto.getMethod(),
+                PaymentMethod.valueOf(dto.getMethod()),
                 dto.getTotal(),
                 dto.getStatus(),
                 dto.getBookingId(),
@@ -69,7 +70,7 @@ public class PaymentService {
     private PaymentResponseDTO mapEntityToResponse(Payment payment) {
         return new PaymentResponseDTO(
                 payment.getId(),
-                payment.getMethod(),
+                String.valueOf(payment.getMethod()),
                 payment.getTotal(),
                 payment.getStatus(),
                 payment.getBookingId(),

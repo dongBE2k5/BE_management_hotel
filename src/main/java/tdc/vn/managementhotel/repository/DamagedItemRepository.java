@@ -17,4 +17,5 @@ public interface DamagedItemRepository extends JpaRepository<DamagedItem, Long> 
     List<DamagedItem> findByRoom(Room room);
     List<DamagedItem> findByRequestStaff(RequestStaff requestStaff);
     List<DamagedItem> findByBooking(Booking booking);
+    List<DamagedItem> findByBookingId(Long booking);
 }

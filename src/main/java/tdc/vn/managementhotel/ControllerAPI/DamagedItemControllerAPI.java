@@ -93,7 +93,7 @@ public class DamagedItemControllerAPI {
     public ResponseEntity<ApiResponse<List<DamagedItemResponseDTO>>> getByBooking(@PathVariable Long bookingID) {
 
         List<DamagedItemResponseDTO> result = damagedItemService.getByBooking(bookingID);
-        return ResponseEntity.ok(ApiResponse.success("Danh sách vật phẩm hư hỏng trong phòng booking" + bookingID, result));
+        return ResponseEntity.ok(ApiResponse.success("Danh sách vật phẩm hư hỏng trong phòng booking" , result));
     }
 }
 

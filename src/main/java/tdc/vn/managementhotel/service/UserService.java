@@ -1,5 +1,6 @@
 package tdc.vn.managementhotel.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -28,22 +29,31 @@ import org.springframework.mail.javamail.JavaMailSender;
 import java.util.regex.Pattern;
 
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
-    @Autowired
-    private UserRepository userRepository;
 
-    @Autowired
-    private RoleRepository roleRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private JavaMailSender mailSender;
+    private final RoleRepository roleRepository;
+
+
+    private final PasswordEncoder passwordEncoder;
+
+
+    private final JavaMailSender mailSender;
+
+    private final EmployeeRepository employeeRepository;
+
+    private final EmployeeService employeeService;
+    private final HotelRepository hotelRepository;
 
     private final Map<String, String> otpStorage = new HashMap<>();
     private final Map<String, LocalDateTime> otpExpiry = new HashMap<>();
+
+    /// luue email da xac thuc
+    private final Map<String, Boolean> verifiedEmail = new HashMap<>();
 
     /**
      * Đăng ký user mới với role mặc định ROLE_USER
@@ -55,11 +65,8 @@ public class UserService {
             Pattern.compile("^(?=.{6,}$)(?=.*[A-Z])(?=.*[^A-Za-z0-9])\\S+$");
     private static final Pattern GMAIL_PATTERN =
             Pattern.compile("^[A-Za-z0-9._%+-]+@gmail\\.com$");
-    @Autowired
-    private EmployeeRepository employeeRepository;
-    @Autowired
-    private EmployeeService employeeService;
-    private HotelRepository hotelRepository;
+
+
 
     public UserResponse register(RegisterRequest req) {
         if (req.getFullName() == null || req.getFullName().trim().isEmpty()) {
@@ -98,6 +105,9 @@ public class UserService {
         if (req.getEmail() != null && userRepository.existsByEmail(req.getEmail())) {
             throw new RuntimeException("Email đã tồn tại");
         }
+        if (!verifiedEmail.getOrDefault(req.getEmail(), false)) {
+            throw new RuntimeException("Bạn phải xác minh email trước khi đăng ký.");
+        }
 
         Role defaultRole = roleRepository.findByName("ROLE_USER")
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy ROLE_USER."));
@@ -109,6 +119,9 @@ public class UserService {
         user.setFullName(req.getFullName());
         user.setPhone(req.getPhone());
         user.setRole(defaultRole);
+
+        // ❗ Xóa trạng thái verified để tránh lạm dụng
+        verifiedEmail.remove(req.getEmail());
 
         return mapEntityToResponse(userRepository.save(user));
     }
@@ -132,7 +145,7 @@ public class UserService {
         user.setEmail(req.getEmail());
         user.setFullName(req.getFullName());
         user.setPhone(req.getPhone());
-//        user.setCccd(req.getCccd());
+        user.setCccd(req.getCccd());
         user.setRole(role);
 
 
@@ -246,6 +259,31 @@ public class UserService {
 
         return "Đặt lại mật khẩu thành công!";
     }
+    public void sendOtpForRegister(String email) {
+
+        if (!GMAIL_PATTERN.matcher(email).matches()) {
+            throw new RuntimeException("Email không hợp lệ! Chỉ chấp nhận @gmail.com.");
+        }
+
+        // Nếu email đã tồn tại → không cho đăng ký
+        if (userRepository.existsByEmail(email)) {
+            throw new RuntimeException("Email đã tồn tại trong hệ thống!");
+        }
+
+        // Tạo OTP
+        String otp = String.format("%06d", new Random().nextInt(999999));
+
+        otpStorage.put(email, otp);
+        otpExpiry.put(email, LocalDateTime.now().plusMinutes(5));
+
+        SimpleMailMessage msg = new SimpleMailMessage();
+        msg.setTo(email);
+        msg.setSubject("Xác thực email đăng ký - Management Hotel");
+        msg.setText("Mã OTP đăng ký của bạn là: " + otp + "\nCó hiệu lực trong 5 phút.");
+
+        mailSender.send(msg);
+    }
+
     public void sendOtpToEmail(String email) {
         // Kiểm tra email có tồn tại trong hệ thống không
         User user = userRepository.findByEmail(email)
@@ -277,15 +315,17 @@ public class UserService {
         String storedOtp = otpStorage.get(email);
         LocalDateTime expiry = otpExpiry.get(email);
 
-        // Kiểm tra đúng mã và chưa hết hạn
         if (storedOtp.equals(otp) && expiry.isAfter(LocalDateTime.now())) {
-            // Xóa OTP sau khi dùng
             otpStorage.remove(email);
             otpExpiry.remove(email);
+
+            // ĐÁNH DẤU EMAIL ĐÃ XÁC THỰC
+            verifiedEmail.put(email, true);
             return true;
         }
 
         return false;
     }
+
 
 }

@@ -7,6 +7,7 @@ import tdc.vn.managementhotel.entity.TypeOfRoom;
 import tdc.vn.managementhotel.entity.TypeOfRoomItem;
 
 import java.math.BigDecimal;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,6 +15,8 @@ import java.util.Optional;
 public interface TypeOfRoomItemRepository extends JpaRepository<TypeOfRoomItem, Long> {
     List<TypeOfRoomItem> findByTypeOfRoom(TypeOfRoom typeOfRoom);
     Optional<TypeOfRoomItem> findByTypeOfRoomAndItem(TypeOfRoom typeOfRoom, Item item);
-
+    List<TypeOfRoomItem> findByTypeOfRoomAndItemIn(TypeOfRoom typeOfRoom, List<Item> items);
     Optional<TypeOfRoomItem> findByItemId(Long itemId);
+
+    List<TypeOfRoomItem> findByItemIn(List<Item> items);
 }
