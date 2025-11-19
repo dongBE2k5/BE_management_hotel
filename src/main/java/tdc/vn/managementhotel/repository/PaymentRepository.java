@@ -9,4 +9,6 @@ import java.util.Optional;
 public interface PaymentRepository extends JpaRepository<Payment,Long> {
     Optional <Payment> findPaymentByBookingId(Long bookingId);
     List<Payment> findAllByBookingId(Long bookingId); // 🆕 để get list
+
+    Optional<Payment> findPaymentById(Long id);
 }

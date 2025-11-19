@@ -15,5 +15,5 @@ public class ItemRequestDTO {
     private Long id;
     private String name;
     private BigDecimal price;
-    private Long HotelId;
+    private Long hotelId;
 }

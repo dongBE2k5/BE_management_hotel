@@ -80,49 +80,84 @@ public class TypeOfRoomItemService {
                 .collect(Collectors.toList());
     }
 
+
     /**
      * Tạo mới hoặc cập nhật danh sách tiện ích cho loại phòng
      */
     @Transactional
     public String createOrUpdateRoomItems(RoomItemRequestDTO dto) {
 
+        // 1️⃣ Lấy loại phòng
         TypeOfRoom typeOfRoom = typeOfRoomRepository.findById(dto.getTypeOfRoomId())
-                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy loại phòng có ID: " + dto.getTypeOfRoomId()));
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Không tìm thấy loại phòng có ID: " + dto.getTypeOfRoomId()));
 
-        List<TypeOfRoomItem> toSave = dto.getItems().stream().map(itemDetail -> {
-            Item item = (itemDetail.getItemId() != null)
-                    ? itemRepository.findById(itemDetail.getItemId()).orElse(null)
-                    : null;
+        // 2️⃣ Nếu là thêm nhiều item (batch)
+        if (dto.isBatchRequest()) {
 
-            // Kiểm tra (typeOfRoom, item) đã tồn tại chưa
-            TypeOfRoomItem existing = typeOfRoomItemRepository.findByTypeOfRoomAndItem(typeOfRoom, item)
-                    .orElse(null);
+            List<TypeOfRoomItem> toSave = dto.getItems().stream().map(itemDetail -> {
 
-            if (existing != null) {
-                existing.setQuantity(itemDetail.getQuantity());
+                Item item = itemRepository.findById(itemDetail.getItemId())
+                        .orElseThrow(() -> new EntityNotFoundException(
+                                "Không tìm thấy tiện ích ID: " + itemDetail.getItemId()));
 
-                return existing;
-            }
+                // Kiểm tra tồn tại
+                TypeOfRoomItem existing = typeOfRoomItemRepository
+                        .findByTypeOfRoomAndItem(typeOfRoom, item)
+                        .orElse(null);
 
-            // Nếu chưa có thì tạo mới
-            TypeOfRoomItem newEntity = new TypeOfRoomItem();
-            newEntity.setTypeOfRoom(typeOfRoom);
-            newEntity.setItem(item);
-            newEntity.setQuantity(itemDetail.getQuantity());
+                if (existing != null) {
+                    existing.setQuantity(itemDetail.getQuantity());
+                    return existing;
+                }
 
+                // Tạo mới
+                TypeOfRoomItem newEntity = new TypeOfRoomItem();
+                newEntity.setTypeOfRoom(typeOfRoom);
+                newEntity.setItem(item);
+                newEntity.setQuantity(itemDetail.getQuantity());
 
-            // 🧠 Thêm dòng này để gán id tổng hợp
-            newEntity.getId().setTypeOfRoomId(typeOfRoom.getId());
-            newEntity.getId().setItemId(item.getId());
+                // Composite key tự động lấy từ relationship → KHÔNG tự set thủ công
 
-            return newEntity;
-        }).collect(Collectors.toList());
+                return newEntity;
 
-        typeOfRoomItemRepository.saveAll(toSave);
+            }).collect(Collectors.toList());
 
-        return "Đã thêm/cập nhật " + toSave.size() + " tiện ích cho loại phòng ID " + typeOfRoom.getId();
+            typeOfRoomItemRepository.saveAll(toSave);
+
+            return "Đã thêm/cập nhật " + toSave.size() +
+                    " tiện ích cho loại phòng ID " + typeOfRoom.getId();
+        }
+
+        // 3️⃣ Nếu là thêm 1 item (single)
+        if (dto.getItemId() == null)
+            throw new IllegalArgumentException("Thiếu itemId cho yêu cầu thêm đơn lẻ");
+
+        Item item = itemRepository.findById(dto.getItemId())
+                .orElseThrow(() -> new EntityNotFoundException(
+                        "Không tìm thấy tiện ích ID: " + dto.getItemId()));
+
+        // Kiểm tra đã tồn tại chưa
+        TypeOfRoomItem existing = typeOfRoomItemRepository
+                .findByTypeOfRoomAndItem(typeOfRoom, item)
+                .orElse(null);
+
+        if (existing != null) {
+            existing.setQuantity(dto.getQuantity());
+            typeOfRoomItemRepository.save(existing);
+
+            return "Đã cập nhật tiện ích '" + item.getName() + "' cho loại phòng ID " + typeOfRoom.getId();
+        }
+
+        // Tạo mới
+        TypeOfRoomItem newEntity = new TypeOfRoomItem();
+        newEntity.setTypeOfRoom(typeOfRoom);
+        newEntity.setItem(item);
+        newEntity.setQuantity(dto.getQuantity());
+        typeOfRoomItemRepository.save(newEntity);
+
+        return "Đã thêm tiện ích mới '" + item.getName() + "' cho loại phòng ID " + typeOfRoom.getId();
     }
-
 
     @Transactional
     public String updateRoomItemsByTypeOfRoomId(Long typeOfRoomId, RoomItemRequestDTO dto) {

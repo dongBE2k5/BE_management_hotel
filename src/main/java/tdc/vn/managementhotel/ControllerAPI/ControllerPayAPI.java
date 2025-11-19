@@ -21,10 +21,12 @@ import tdc.vn.managementhotel.config.GlobalStore;
 import tdc.vn.managementhotel.config.ZaloPayConfig;
 import tdc.vn.managementhotel.dto.ApiResponse;
 import tdc.vn.managementhotel.dto.BookingDTO.ChangeBookingStatusRequestDTO;
+import tdc.vn.managementhotel.dto.HotelDTO.HotelResponseDTO;
 import tdc.vn.managementhotel.dto.PaymentDTO.PaymentResponseDTO;
 import tdc.vn.managementhotel.entity.HostHotel;
 import tdc.vn.managementhotel.entity.Hotel;
 import tdc.vn.managementhotel.enums.BookingStatus;
+import tdc.vn.managementhotel.enums.PaymentStatus;
 import tdc.vn.managementhotel.repository.HostHotelRepository;
 import tdc.vn.managementhotel.repository.HotelRepository;
 import tdc.vn.managementhotel.service.BookingService;
@@ -78,7 +80,7 @@ public class ControllerPayAPI {
                                        @RequestParam("ip") String ip, HttpServletRequest request) {
 	    String baseUrl = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort();
 		String vnpayUrl = vnPayService.createOrder(orderTotal, orderInfo, baseUrl);
-        PaymentResponseDTO paymentResponseDTO = new PaymentResponseDTO(null ,method.toUpperCase(Locale.ROOT),(long)orderTotal,"Wait for payment",Long.parseLong(orderInfo),null);
+        PaymentResponseDTO paymentResponseDTO = new PaymentResponseDTO(null ,method.toUpperCase(Locale.ROOT),(long)orderTotal,PaymentStatus.WAITING.toString(),Long.parseLong(orderInfo),null);
         paymentService.createPay(paymentResponseDTO);
 
         globalStore.setValue(String.valueOf(orderInfo),ip);
@@ -119,7 +121,7 @@ public class ControllerPayAPI {
 
             messagingTemplate.convertAndSend("/topic/booking", payload);
         }
-        PaymentResponseDTO paymentResponseDTO = new PaymentResponseDTO(null , null, Long.parseLong(totalPrice), status, Long.parseLong(orderInfo), String.valueOf(paymentStatus));
+        PaymentResponseDTO paymentResponseDTO = new PaymentResponseDTO(null , null, Long.parseLong(totalPrice), status.toUpperCase(), Long.parseLong(orderInfo), String.valueOf(paymentStatus));
         paymentService.updatePay(paymentResponseDTO);
 
         return new RedirectView (deepLink);
@@ -145,7 +147,7 @@ public class ControllerPayAPI {
     public ResponseEntity<ApiResponse<PaymentResponseDTO>> manualpayment(@RequestParam("amount") int orderTotal,
                                                                          @RequestParam("orderInfo") String orderInfo,
                                                                          @RequestParam("method") String method){
-        PaymentResponseDTO paymentResponseDTO = new PaymentResponseDTO(null ,method,(long)orderTotal,"success",Long.parseLong(orderInfo),null);
+        PaymentResponseDTO paymentResponseDTO = new PaymentResponseDTO(null ,method,(long)orderTotal, PaymentStatus.SUCCESS.toString(),Long.parseLong(orderInfo),null);
         paymentService.createPay(paymentResponseDTO);
 
         return ResponseEntity.ok(ApiResponse.success("Thanh toán thành công",paymentResponseDTO));
@@ -161,11 +163,24 @@ public class ControllerPayAPI {
         String url = "https://img.vietqr.io/image/"+hostHotel.getNganHang()+"-"+hostHotel.getStk()+"-compact2.png?amount="+orderTotal+"&addInfo="+orderInfo+"&accountName="+hostHotel.getUser().getFullName();
 
 //
-        PaymentResponseDTO paymentResponseDTO = new PaymentResponseDTO(null ,method,(long)orderTotal,"Wait for payment",Long.parseLong(orderInfo),null);
+        PaymentResponseDTO paymentResponseDTO = new PaymentResponseDTO(null ,method,(long)orderTotal,PaymentStatus.WAITING.toString(),Long.parseLong(orderInfo),null);
         paymentService.createPay(paymentResponseDTO);
 
 
 
         return ResponseEntity.ok(ApiResponse.success("Thanh toán thành công",url));
+    }
+
+    @GetMapping("{idHotel}/hotel")
+    public  ResponseEntity<ApiResponse<List<PaymentResponseDTO>>> getHotel(@PathVariable Long idHotel){
+
+        return ResponseEntity.ok(ApiResponse.success("lấy danh sách payment theo hotel thành cong",paymentService.getByHotel(idHotel))) ;
+    }
+
+    @PutMapping("{id}/status")
+    public ResponseEntity<ApiResponse<PaymentResponseDTO>>updateStatus(@PathVariable Long id,@RequestParam("status") String status){
+        PaymentResponseDTO response=paymentService.updatePayById(id,status);
+
+        return ResponseEntity.ok(ApiResponse.success("Cập nhật trạng thái thành công ",response));
     }
 }

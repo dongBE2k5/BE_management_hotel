@@ -71,4 +71,7 @@ public class Booking {
     @OneToMany(mappedBy = "booking",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DamagedItem> damagedItems;
 
+    @OneToMany(mappedBy = "booking",cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Payment> payments;
+
 }
