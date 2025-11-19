@@ -4,9 +4,12 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import tdc.vn.managementhotel.dto.ApiResponse;
 import tdc.vn.managementhotel.dto.BookingDTO.BookingRequestDTO;
 import tdc.vn.managementhotel.dto.BookingDTO.BookingResponseDTO;
 import tdc.vn.managementhotel.dto.BookingDTO.ChangeBookingStatusRequestDTO;
@@ -24,6 +27,7 @@ import tdc.vn.managementhotel.repository.*;
 
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -86,6 +90,33 @@ public class BookingService {
                 .stream()
                 .map(this::mapEntityToResponse)
                 .collect(Collectors.toList());
+    }
+
+    public ResponseEntity<ApiResponse> findByRoomId(Long roomId) {
+        List<Booking> bookings = bookingRepository.findByRoomId(roomId);
+
+        if (bookings.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ApiResponse(
+                            HttpStatus.NOT_FOUND.value(),
+                            "Không tìm thấy booking nào cho roomId = " + roomId,
+                            null,
+                            LocalDateTime.now()
+                    ));
+        }
+
+        List<BookingResponseDTO> responseList = bookings.stream()
+                .map(this::mapEntityToResponse)
+                .toList();
+
+        return ResponseEntity.ok(
+                new ApiResponse(
+                        HttpStatus.OK.value(),
+                        "Lấy danh sách booking theo roomId thành công",
+                        responseList,
+                        LocalDateTime.now()
+                )
+        );
     }
 
     public List<BookingResponseDTO> findByUserID(Long id) {
@@ -179,7 +210,7 @@ public class BookingService {
                 booking.getUpdatedAt(),
                 booking.getVoucherIds(),
                 booking.getPaidPrice(),
-                booking.getHotelPaymentType().getPaymentType().getPaymentType().name(),
+                booking.getHotelPaymentType() != null ? booking.getHotelPaymentType().getPaymentType().getPaymentType().name() : null,
                 booking.getPaymentMethod()
         );
     }

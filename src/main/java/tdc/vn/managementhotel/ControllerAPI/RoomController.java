@@ -57,5 +57,5 @@ public class RoomController {
                                                                   @RequestParam LocalDate checkInDate,
                                                                   @RequestParam LocalDate checkOutDate) {
             return ResponseEntity.ok(roomService.getRoomsAvailable(hotelId, checkInDate, checkOutDate));
-    }
+    }   
 }

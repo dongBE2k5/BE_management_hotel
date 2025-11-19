@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import tdc.vn.managementhotel.dto.ApiResponse;
 import tdc.vn.managementhotel.dto.BookingDTO.BookingRequestDTO;
 import tdc.vn.managementhotel.dto.BookingDTO.BookingResponseDTO;
 import tdc.vn.managementhotel.dto.BookingDTO.ChangeBookingStatusRequestDTO;
@@ -56,6 +57,12 @@ public class BookingController {
         }
 
         return ResponseEntity.ok().body(bookings); // 200 OK + JSON list
+    }
+
+    @GetMapping("/room/{id}")
+    public ResponseEntity<ApiResponse> getAllBookingsByRoomId(@PathVariable Long id) {
+        return bookingService.findByRoomId(id);
+
     }
 
     @GetMapping("/user/{id}")
