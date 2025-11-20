@@ -3,7 +3,12 @@ package tdc.vn.managementhotel.config;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import tdc.vn.managementhotel.entity.HotelPaymentType;
+import tdc.vn.managementhotel.entity.PaymentTypes;
 import tdc.vn.managementhotel.entity.Role;
+import tdc.vn.managementhotel.enums.PaymentType;
+import tdc.vn.managementhotel.repository.HotelPaymentTypeRepository;
+import tdc.vn.managementhotel.repository.PaymentTypeRepository;
 import tdc.vn.managementhotel.repository.RoleRepository;
 
 @Configuration
@@ -47,6 +52,36 @@ public class DataInitializer {
                 Role userRole = new Role();
                 userRole.setName("ROLE_HOST");
                 roleRepository.save(userRole);
+            }
+        };
+    }
+    @Bean
+    CommandLineRunner initPaymentType(PaymentTypeRepository paymentTypeRepository) {
+        return args -> {
+//
+            if (paymentTypeRepository.findByPaymentType(PaymentType.FULL).isEmpty()) {
+                PaymentTypes paymentType = new PaymentTypes();
+                paymentType.setPaymentType(PaymentType.FULL);
+                paymentTypeRepository.save(paymentType);
+            }
+
+            if (paymentTypeRepository.findByPaymentType(PaymentType.DEPOSIT).isEmpty()) {
+                PaymentTypes paymentType = new PaymentTypes();
+                paymentType.setPaymentType(PaymentType.DEPOSIT);
+                paymentTypeRepository.save(paymentType);
+            }
+        };
+    }
+
+    @Bean
+    CommandLineRunner initHotelPaymentType(HotelPaymentTypeRepository hotelPaymentTypeRepository, PaymentTypeRepository paymentTypeRepository) {
+        return args -> {
+            PaymentTypes paymentType =  paymentTypeRepository.findById(1L).orElse(null);
+            if (hotelPaymentTypeRepository.findById(1L).isEmpty()) {
+                HotelPaymentType hotelPaymentType = new HotelPaymentType();
+                hotelPaymentType.setDepositPercent(100.0);
+                hotelPaymentType.setPaymentType(paymentType);
+                hotelPaymentTypeRepository.save(hotelPaymentType);
             }
         };
     }
