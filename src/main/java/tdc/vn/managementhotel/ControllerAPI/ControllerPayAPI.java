@@ -154,7 +154,7 @@ public class ControllerPayAPI {
     }
 
     @PostMapping("/createpayqr")
-    public ResponseEntity<ApiResponse<String>> qrpayment(@RequestParam("amount") int orderTotal,
+    public ResponseEntity<ApiResponse<Object>> qrpayment(@RequestParam("amount") int orderTotal,
                                                                          @RequestParam("orderInfo") String orderInfo,
                                                                          @RequestParam("method") String method,
                                                                      @RequestParam("hotelId") Long hotelId){
@@ -164,11 +164,13 @@ public class ControllerPayAPI {
 
 //
         PaymentResponseDTO paymentResponseDTO = new PaymentResponseDTO(null ,method,(long)orderTotal,PaymentStatus.WAITING.toString(),Long.parseLong(orderInfo),null);
-        paymentService.createPay(paymentResponseDTO);
+        PaymentResponseDTO result= paymentService.createPay(paymentResponseDTO);
+        HashMap<String,Object> map = new HashMap<>();
+        map.put("url",url);
+        map.put("idpay",result.getId().toString());
 
 
-
-        return ResponseEntity.ok(ApiResponse.success("Thanh toán thành công",url));
+        return ResponseEntity.ok(ApiResponse.success("Thanh toán thành công",map));
     }
 
     @GetMapping("{idHotel}/hotel")
