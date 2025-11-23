@@ -12,14 +12,19 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import tdc.vn.managementhotel.dto.ApiResponse;
 import tdc.vn.managementhotel.dto.HostHotelDTO.HostHotelResponseDTO;
+import tdc.vn.managementhotel.dto.HotelDTO.HotelDTO;
+import tdc.vn.managementhotel.dto.LocationDTO.LocationResponseDTO;
 import tdc.vn.managementhotel.dto.LoginRequest;
 import tdc.vn.managementhotel.dto.RegisterRequest;
 import tdc.vn.managementhotel.entity.Hotel;
+import tdc.vn.managementhotel.entity.Location;
 import tdc.vn.managementhotel.enums.HostHotelStatus;
 import tdc.vn.managementhotel.model.CustomUserDetails;
 import tdc.vn.managementhotel.repository.HotelRepository;
+import tdc.vn.managementhotel.repository.LocationRepository;
 import tdc.vn.managementhotel.service.HostHotelService;
 import tdc.vn.managementhotel.service.HotelService;
+import tdc.vn.managementhotel.service.LocationService;
 import tdc.vn.managementhotel.service.UserService;
 import tdc.vn.managementhotel.util.JwtUtil;
 
@@ -33,6 +38,7 @@ public class AdminWebController {
     private final JwtUtil jwtUtil;
     private final HostHotelService hostHotelService;
     private final HotelRepository hotelRepository;
+    private final LocationService locationService;
     private final HotelService hotelService;
 
     @GetMapping("login")
@@ -107,6 +113,31 @@ public class AdminWebController {
         } catch (RuntimeException ex) {
             model.addAttribute("error", ex.getMessage());
             return "register";
+        }
+    }
+
+    @GetMapping("/admin/hosts/{hostID}/hotels/new")
+    public String showNewHotel(@PathVariable Long hostID, Model model) {
+        List<LocationResponseDTO> locationList =  locationService.findAll();
+        model.addAttribute("hostID", hostID);
+        model.addAttribute("locationList", locationList);
+        return "admin/add-hotel";
+    }
+
+    @PostMapping("/admin/hosts/{hostID}/hotels")
+    public String createHotel(
+            @PathVariable Long hostID,
+            @ModelAttribute("hotel") HotelDTO dto,
+            Model model) {
+        System.out.println("Vao ham ADD");
+        try {
+            dto.setUserId(hostID); // gán hostID vào DTO
+            hotelService.createHotel(dto);
+            return "redirect:/hosts";
+
+        } catch (Exception ex) {
+            model.addAttribute("error", ex.getMessage());
+            return "admin/add-hotel"; // quay lại form nếu lỗi
         }
     }
 

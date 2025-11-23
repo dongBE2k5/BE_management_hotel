@@ -17,4 +17,5 @@ public class HostHotelResponseDTO {
     private String cccdMatSau;
     private String giayPhepKinhDoanh;
     private String status;
+    private String fullName;
 }

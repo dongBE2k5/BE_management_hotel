@@ -106,6 +106,7 @@ public class HostHotelService {
         dto.setCccdMatSau(entity.getCccdMatSau());
         dto.setGiayPhepKinhDoanh(entity.getGiayPhepKinhDoanh());
         dto.setStatus(entity.getStatus().name());
+        dto.setFullName(entity.getUser().getFullName());
         return dto;
     }
 }

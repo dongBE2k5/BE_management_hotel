@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Thêm khách sạn</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-50 min-h-screen flex items-start py-12">
+<main class="w-full max-w-4xl mx-auto p-6">
+    <h1 class="text-2xl font-semibold mb-4">Thêm khách sạn mới</h1>
+
+    <!-- FORM ĐÃ SỬA -->
+    <form th:action="@{'/admin/hosts/' + ${hostID} + '/hotels'}"
+          method="post"
+          id="addHotelForm"
+          class="space-y-6 bg-white p-6 rounded-2xl shadow">
+
+        <input type="hidden" name="hostId" th:value="${hostID}" />
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+            <!-- LOCATION LIST (đã đổi name="locationId") -->
+            <div>
+                <label for="locationId" class="block text-sm font-medium">Vị trí</label>
+                <select id="locationId" name="locationId"
+                        class="mt-1 block w-full rounded-md border px-3 py-2 shadow-sm
+                               focus:outline-none focus:ring-2 focus:ring-sky-300 border-gray-200">
+
+                    <option value="">-- Chọn vị trí --</option>
+
+                    <option th:each="loc : ${locationList}"
+                            th:value="${loc.id}"
+                            th:text="${loc.name}">
+                    </option>
+                </select>
+                <p id="err-locationId" class="mt-1 text-sm text-red-500 hidden"></p>
+            </div>
+
+            <div>
+                <label for="name" class="block text-sm font-medium">Tên khách sạn</label>
+                <input id="name" name="name" type="text"
+                       placeholder="Ví dụ: Sunrise Hotel"
+                       class="mt-1 block w-full rounded-md border px-3 py-2 shadow-sm
+                              focus:outline-none focus:ring-2 focus:ring-sky-300 border-gray-200" />
+                <p id="err-name" class="mt-1 text-sm text-red-500 hidden"></p>
+            </div>
+
+            <div class="md:col-span-2">
+                <label for="address" class="block text-sm font-medium">Địa chỉ</label>
+                <input id="address" name="address" type="text"
+                       class="mt-1 block w-full rounded-md border px-3 py-2 shadow-sm
+                              focus:outline-none focus:ring-2 focus:ring-sky-300 border-gray-200" />
+                <p id="err-address" class="mt-1 text-sm text-red-500 hidden"></p>
+            </div>
+
+            <div>
+                <label for="phone" class="block text-sm font-medium">Số điện thoại</label>
+                <input id="phone" name="phone" type="tel"
+                       class="mt-1 block w-full rounded-md border px-3 py-2 shadow-sm
+                              focus:outline-none focus:ring-2 focus:ring-sky-300 border-gray-200" />
+                <p id="err-phone" class="mt-1 text-sm text-red-500 hidden"></p>
+            </div>
+
+            <div>
+                <label for="email" class="block text-sm font-medium">Email</label>
+                <input id="email" name="email" type="email"
+                       class="mt-1 block w-full rounded-md border px-3 py-2 shadow-sm
+                              focus:outline-none focus:ring-2 focus:ring-sky-300 border-gray-200" />
+                <p id="err-email" class="mt-1 text-sm text-red-500 hidden"></p>
+            </div>
+
+            <div class="md:col-span-2">
+                <label for="imageUrl" class="block text-sm font-medium">URL ảnh</label>
+                <input id="imageUrl" name="imageUrl" type="url"
+                       placeholder="https://example.com/image.jpg"
+                       class="mt-1 block w-full rounded-md border px-3 py-2 shadow-sm
+                              focus:outline-none focus:ring-2 focus:ring-sky-300 border-gray-200" />
+                <p id="err-imageUrl" class="mt-1 text-sm text-red-500 hidden"></p>
+            </div>
+
+            <div>
+                <label for="status" class="block text-sm font-medium">Trạng thái</label>
+                <select id="status" name="status"
+                        class="mt-1 block w-full rounded-md border px-3 py-2 shadow-sm
+                               focus:outline-none focus:ring-2 focus:ring-sky-300 border-gray-200">
+                    <option value="Gần trung tâm">Gần trung tâm</option>
+                    <option value="Gần biển">Gần biển</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-3 pt-4 border-t">
+            <button type="reset" class="px-4 py-2 rounded-md border bg-white text-sm">Reset</button>
+            <button type="submit"
+                    class="px-5 py-2 rounded-md bg-sky-600 text-white text-sm shadow hover:bg-sky-700">
+                Thêm khách sạn
+            </button>
+        </div>
+
+    </form>
+</main>
+
+<script>
+    // CHỈ validate nhẹ — không chặn submit
+    const form = document.getElementById("addHotelForm");
+
+    form.addEventListener("submit", function(e) {
+        let ok = true;
+
+        const location = document.getElementById("locationId").value.trim();
+        const name = document.getElementById("name").value.trim();
+        const address = document.getElementById("address").value.trim();
+
+        if (!location) { ok = false; document.getElementById("err-locationId").innerText = "Vui lòng chọn vị trí"; }
+        if (!name) { ok = false; document.getElementById("err-name").innerText
