@@ -51,7 +51,7 @@ public class AdminWebController {
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
             String token = jwtUtil.generateToken(authentication);
 
-           return "admin-dashboard";
+           return "redirect:hosts";
         } catch (RuntimeException ex) {
             model.addAttribute("error", ex.getMessage());
             return "login";
