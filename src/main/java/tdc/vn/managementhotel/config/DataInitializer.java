@@ -56,7 +56,7 @@ public class DataInitializer {
         };
     }
     @Bean
-    CommandLineRunner initPaymentType(PaymentTypeRepository paymentTypeRepository) {
+    CommandLineRunner initPaymentType(PaymentTypeRepository paymentTypeRepository, HotelPaymentTypeRepository hotelPaymentTypeRepository) {
         return args -> {
 //
             if (paymentTypeRepository.findByPaymentType(PaymentType.FULL).isEmpty()) {
@@ -70,19 +70,21 @@ public class DataInitializer {
                 paymentType.setPaymentType(PaymentType.DEPOSIT);
                 paymentTypeRepository.save(paymentType);
             }
+            PaymentTypes paymentType =  paymentTypeRepository.findById(1L).orElse(null);
+            if (hotelPaymentTypeRepository.findById(1L).isEmpty() && paymentType != null) {
+                HotelPaymentType hotelPaymentType = new HotelPaymentType();
+                hotelPaymentType.setDepositPercent(100.0);
+                hotelPaymentType.setPaymentType(paymentType);
+                hotelPaymentTypeRepository.save(hotelPaymentType);
+            }
+
         };
     }
 
     @Bean
     CommandLineRunner initHotelPaymentType(HotelPaymentTypeRepository hotelPaymentTypeRepository, PaymentTypeRepository paymentTypeRepository) {
         return args -> {
-            PaymentTypes paymentType =  paymentTypeRepository.findById(1L).orElse(null);
-            if (hotelPaymentTypeRepository.findById(1L).isEmpty()) {
-                HotelPaymentType hotelPaymentType = new HotelPaymentType();
-                hotelPaymentType.setDepositPercent(100.0);
-                hotelPaymentType.setPaymentType(paymentType);
-                hotelPaymentTypeRepository.save(hotelPaymentType);
-            }
+
         };
     }
 }
