@@ -3,7 +3,12 @@ package tdc.vn.managementhotel.config;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import tdc.vn.managementhotel.entity.HotelPaymentType;
+import tdc.vn.managementhotel.entity.PaymentTypes;
 import tdc.vn.managementhotel.entity.Role;
+import tdc.vn.managementhotel.enums.PaymentType;
+import tdc.vn.managementhotel.repository.HotelPaymentTypeRepository;
+import tdc.vn.managementhotel.repository.PaymentTypeRepository;
 import tdc.vn.managementhotel.repository.RoleRepository;
 
 @Configuration
@@ -48,6 +53,38 @@ public class DataInitializer {
                 userRole.setName("ROLE_HOST");
                 roleRepository.save(userRole);
             }
+        };
+    }
+    @Bean
+    CommandLineRunner initPaymentType(PaymentTypeRepository paymentTypeRepository, HotelPaymentTypeRepository hotelPaymentTypeRepository) {
+        return args -> {
+//
+            if (paymentTypeRepository.findByPaymentType(PaymentType.FULL).isEmpty()) {
+                PaymentTypes paymentType = new PaymentTypes();
+                paymentType.setPaymentType(PaymentType.FULL);
+                paymentTypeRepository.save(paymentType);
+            }
+
+            if (paymentTypeRepository.findByPaymentType(PaymentType.DEPOSIT).isEmpty()) {
+                PaymentTypes paymentType = new PaymentTypes();
+                paymentType.setPaymentType(PaymentType.DEPOSIT);
+                paymentTypeRepository.save(paymentType);
+            }
+            PaymentTypes paymentType =  paymentTypeRepository.findById(1L).orElse(null);
+            if (hotelPaymentTypeRepository.findById(1L).isEmpty() && paymentType != null) {
+                HotelPaymentType hotelPaymentType = new HotelPaymentType();
+                hotelPaymentType.setDepositPercent(100.0);
+                hotelPaymentType.setPaymentType(paymentType);
+                hotelPaymentTypeRepository.save(hotelPaymentType);
+            }
+
+        };
+    }
+
+    @Bean
+    CommandLineRunner initHotelPaymentType(HotelPaymentTypeRepository hotelPaymentTypeRepository, PaymentTypeRepository paymentTypeRepository) {
+        return args -> {
+
         };
     }
 }
